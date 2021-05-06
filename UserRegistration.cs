@@ -18,7 +18,7 @@ namespace CoWinAlert.Function
     public static class UserRegistration
     {
         [FunctionName("UserRegistration")]
-        [OpenApiOperation("list", "sample")]
+        // [OpenApiOperation("list", "sample")]
         // [OpenApiParameter("Registration Details", In = ParameterLocation., Required = false,Type = typeof(Registration))]
         [OpenApiRequestBody("application/json", typeof(Registration))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
@@ -32,8 +32,6 @@ namespace CoWinAlert.Function
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             Registration registrationData = JsonConvert.DeserializeObject<Registration>(requestBody);
-            
-            
             
             //registrationData.PinCode = new List<string>{"120","123d","123456","`12345"};
             log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));

@@ -10,15 +10,34 @@ namespace CoWinAlert.DTO
     public class Registration : TableEntity
     {
         #region Private Members
+        private bool _isValid = true;
         private SearchMode _searchmode = SearchMode.Pin;
         private List<long> _pincodes = new List<long>();
         private int _yearofBirth = (DateTime.Now.Year - 45);
+        private string _name = "";
         private string _email = "";
         private string _phone = "";
         #endregion
         
         #region Public Members
-        public string Name{get;set;}
+        public string Name{
+            get{
+                return _name;
+            }
+            set{
+                try{
+                    if(!String.IsNullOrEmpty(value)){
+                        _name = value;
+                    }
+                    else{
+                        _isValid = false;
+                    }
+                }
+                catch{
+                    _isValid = false;
+                }
+            }
+        }
         public string EmailID{
             get{
                 return _email;
@@ -29,11 +48,11 @@ namespace CoWinAlert.DTO
                         _email = value;
                     }
                     else{
-                        _email = "-1";
+                        _isValid = false;
                     }
                 }
                 catch{
-                    _email = "-1";
+                    _isValid = false;
                 }
             }
         }
@@ -51,7 +70,7 @@ namespace CoWinAlert.DTO
                     _searchmode = (SearchMode)Enum.Parse(typeof(SearchMode),value);
                 }
                 catch{
-                    ;
+                    _isValid = false;
                 }
             }
         }
@@ -61,9 +80,12 @@ namespace CoWinAlert.DTO
                     if(Regex.IsMatch(value.ToString(),@"^19[0-9]{2}")){
                         _yearofBirth = value;
                     }
+                    else{
+                        _isValid = false;
+                    }
                 }
                 catch{
-                    ;
+                    _isValid = false;
                 }        
             }
         }
@@ -78,9 +100,13 @@ namespace CoWinAlert.DTO
                                         )
                                         .Select(_codes => Int64.Parse(_codes))
                                         .ToList();
+                    if(_pincodes.Count == 0){
+                        _isValid = false;
+                    }
                 }
                 catch{
                     value = new List<string>();
+                    _isValid = false;
                 }
             }
         }
@@ -93,9 +119,12 @@ namespace CoWinAlert.DTO
                     if(Regex.IsMatch(value.ToString(),@"^[0-9]{10}")){
                         _phone = value;
                     }
+                    if(String.IsNullOrEmpty(_phone)){
+                        _isValid = false;
+                    }
                 }
                 catch{
-                    ;
+                    _isValid = false;
                 }        
             }
         }
