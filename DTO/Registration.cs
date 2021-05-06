@@ -1,13 +1,13 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure.Cosmos.Table;
+using Newtonsoft.Json;
 
 namespace CoWinAlert.DTO
 {
-    public class Registration : TableEntity
+    public class Registration
     {
         #region Private Members
         private bool _isValid = true;
@@ -16,6 +16,7 @@ namespace CoWinAlert.DTO
         private string _name = "";
         private string _email = "";
         private string _phone = "";
+        private Vaccine _vaccine = Vaccine.Invalid;
         #endregion
         
         #region Public Members
@@ -88,23 +89,24 @@ namespace CoWinAlert.DTO
                 }        
             }
         }
-        public List<string> PinCode{
+        public List<long> Codes{
             get{
-                return _pincodes.Select(_code => _code.ToString()).ToList();
+                return _pincodes;
             }
+        }
+        public string PinCode{
             set{
                 try{
-                    _pincodes = value.Where(_code => 
-                                        Regex.IsMatch(_code, @"^[0-9]{6}")
-                                        )
-                                        .Select(_codes => Int64.Parse(_codes))
+                    _pincodes = JsonConvert.DeserializeObject<List<string>>(value)
+                                        .Where(_code => 
+                                            Regex.IsMatch(_code, @"^[0-9]{6}")
+                                        ).Select(_codes => Int64.Parse(_codes))
                                         .ToList();
                     if(_pincodes.Count == 0){
                         _isValid = false;
                     }
                 }
                 catch{
-                    value = new List<string>();
                     _isValid = false;
                 }
             }
@@ -127,7 +129,11 @@ namespace CoWinAlert.DTO
                 }        
             }
         }
-
+        public Vaccine Vaccine{
+            get{
+                return _vaccine;
+            }
+        }
         public bool isValid{
             get{
                 return _isValid;
@@ -137,8 +143,7 @@ namespace CoWinAlert.DTO
 
         #region Public Functions        
         public void Initialise(Vaccine vaccineName){
-            PartitionKey = vaccineName.ToString();
-            RowKey = Guid.NewGuid().ToString();
+            _vaccine = vaccineName;
         }
         
         #endregion Public Functions
@@ -147,5 +152,20 @@ namespace CoWinAlert.DTO
         CoviShield,
         Covaxin,
         Invalid
+    }
+    public class RegistrationTableSchema : TableEntity{
+        public RegistrationTableSchema(Registration inp){
+            this.PartitionKey = inp.Vaccine.ToString();
+            this.RowKey = inp.EmailID;
+            this.Phone = inp.Phone;
+            this.Name = inp.Name;
+            this.Age = inp.Age.ToString();
+            this.PinCode = JsonConvert.SerializeObject(inp.Codes);
+        }
+        public string Name;
+        public string Age;
+        public string PinCode;
+        public string Phone;
+
     }
 }

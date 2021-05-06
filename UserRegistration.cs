@@ -31,23 +31,39 @@ namespace CoWinAlert.Function
         {
             log.LogInformation(HttpUtility.HtmlEncode("C# HTTP trigger function processed a request."));
 
-            string vaccine = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
             Vaccine vaccineName = Vaccine.Invalid;
             try{
-                vaccineName = (Vaccine)Enum.Parse(typeof(Vaccine), req.Query["vaccine"]);
+                string vaccine = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
+                vaccineName = (Vaccine)Enum.Parse(typeof(Vaccine), vaccine);
             }
             catch(Exception ex){
-                return HttpResponseHandler.StructureResponse(content: ex,
+                return HttpResponseHandler.StructureResponse(reason: "Invalid Vaccine Name",
+                                                        content: ex,
                                                         code: HttpStatusCode.InternalServerError 
                                                     );
             }
             
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             Registration registrationData = JsonConvert.DeserializeObject<Registration>(requestBody);
-            
-            //registrationData.PinCode = new List<string>{"120","123d","123456","`12345"};
+            registrationData.Initialise(vaccineName);
+            // registrationData.PinCode = "[\"120\",\"123d\",\"123456\",\"`12345\"]";
             log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));            
 
+            try{
+                // Check if it exists in table
+                if(TableInfo.isUserExisting(registrationData)){
+                    // Add to Table
+                    TableInfo.AddRowtoTable(registrationData);
+                }
+            }
+            catch(Exception ex){
+                return HttpResponseHandler.StructureResponse(reason: "Error in Storage",
+                                                        content: ex,
+                                                        code: HttpStatusCode.InternalServerError 
+                                                    );
+            }    
+            
+            
             if(registrationData == null){
                 return HttpResponseHandler.StructureResponse(content: "No data",
                                                         code: HttpStatusCode.BadRequest 
