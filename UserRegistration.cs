@@ -11,41 +11,56 @@ using CoWinAlert.DTO;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Core.Attributes;
 using Microsoft.OpenApi.Models;
 using System.Net;
+using CoWinAlert.Utils;
 using System.Collections.Generic;
+using System.Web;
+using System.Net.Http;
 
 namespace CoWinAlert.Function
 {
     public static class UserRegistration
     {
         [FunctionName("UserRegistration")]
-        // [OpenApiOperation("list", "sample")]
-        // [OpenApiParameter("Registration Details", In = ParameterLocation., Required = false,Type = typeof(Registration))]
+        [OpenApiOperation]
+        [OpenApiParameter("vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiRequestBody("application/json", typeof(Registration))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
-        public static async Task<IActionResult> Run(
+        public static async Task<HttpResponseMessage> RunAsync(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "user/registration")] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation(HttpUtility.HtmlEncode("C# HTTP trigger function processed a request."));
 
-            string name = req.Query["name"];
-
+            string vaccine = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
+            Vaccine vaccineName = Vaccine.Invalid;
+            try{
+                vaccineName = (Vaccine)Enum.Parse(typeof(Vaccine), req.Query["vaccine"]);
+            }
+            catch(Exception ex){
+                return HttpResponseHandler.StructureResponse(content: ex,
+                                                        code: HttpStatusCode.InternalServerError 
+                                                    );
+            }
+            
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             Registration registrationData = JsonConvert.DeserializeObject<Registration>(requestBody);
             
             //registrationData.PinCode = new List<string>{"120","123d","123456","`12345"};
-            log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));
-            
+            log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));            
 
             if(registrationData == null){
-                return new BadRequestObjectResult("No data");
+                return HttpResponseHandler.StructureResponse(content: "No data",
+                                                        code: HttpStatusCode.BadRequest 
+                                                    );
             }
             string responseMessage = $"Hello {registrationData.Name}, ";
             responseMessage += string.IsNullOrEmpty(registrationData.EmailID)
                             ? $"Invalid Email. "
                             : $"{JsonConvert.SerializeObject(registrationData, Formatting.Indented)}";
 
-            return new OkObjectResult(responseMessage);
+            return HttpResponseHandler.StructureResponse(content: responseMessage,
+                                                        code: HttpStatusCode.OK 
+                                                    );
         }
     }
 }

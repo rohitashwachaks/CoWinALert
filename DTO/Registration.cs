@@ -11,7 +11,6 @@ namespace CoWinAlert.DTO
     {
         #region Private Members
         private bool _isValid = true;
-        private SearchMode _searchmode = SearchMode.Pin;
         private List<long> _pincodes = new List<long>();
         private int _yearofBirth = (DateTime.Now.Year - 45);
         private string _name = "";
@@ -61,19 +60,19 @@ namespace CoWinAlert.DTO
                 return DateTime.Now.Year - _yearofBirth;
             }
         }
-        public string SearchByMode{
-            get{
-                return _searchmode.ToString();
-            }
-            set{
-                try{
-                    _searchmode = (SearchMode)Enum.Parse(typeof(SearchMode),value);
-                }
-                catch{
-                    _isValid = false;
-                }
-            }
-        }
+        // public string SearchByMode{
+        //     get{
+        //         return _searchmode.ToString();
+        //     }
+        //     set{
+        //         try{
+        //             _searchmode = (SearchMode)Enum.Parse(typeof(SearchMode),value);
+        //         }
+        //         catch{
+        //             _isValid = false;
+        //         }
+        //     }
+        // }
         public int YearofBirth{
             set{
                 try{
@@ -116,7 +115,7 @@ namespace CoWinAlert.DTO
             }
             set{
                 try{
-                    if(Regex.IsMatch(value.ToString(),@"^[0-9]{10}")){
+                    if(Regex.IsMatch(value.ToString(),@"^[0-9]{10}$")){
                         _phone = value;
                     }
                     if(String.IsNullOrEmpty(_phone)){
@@ -128,29 +127,25 @@ namespace CoWinAlert.DTO
                 }        
             }
         }
+
+        public bool isValid{
+            get{
+                return _isValid;
+            }
+        }
         #endregion Public Members
 
-        #region Public Functions
-        // public Registration(){
-        //     // Name Valid?
-        //     if(! String.IsNullOrEmpty(Name)){
-        //         _isValid = true;
-        //     }
-
-        //     // Email Valid ?
-        //     if(! String.IsNullOrEmpty(_email)){
-        //         _isValid = true;
-        //     }
-
-        //     // Age Valid ?
-
-        // }
-
+        #region Public Functions        
+        public void Initialise(Vaccine vaccineName){
+            PartitionKey = vaccineName.ToString();
+            RowKey = Guid.NewGuid().ToString();
+        }
         
         #endregion Public Functions
     }
-    public enum SearchMode{
-        Pin,
-        District
+    public enum Vaccine{
+        CoviShield,
+        Covaxin,
+        Invalid
     }
 }
