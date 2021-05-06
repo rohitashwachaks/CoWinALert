@@ -11,6 +11,7 @@ using CoWinAlert.DTO;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Core.Attributes;
 using Microsoft.OpenApi.Models;
 using System.Net;
+using System.Collections.Generic;
 
 namespace CoWinAlert.Function
 {
@@ -18,10 +19,11 @@ namespace CoWinAlert.Function
     {
         [FunctionName("UserRegistration")]
         [OpenApiOperation("list", "sample")]
-        [OpenApiParameter("name", In = ParameterLocation.Query, Required = false,Type = typeof(string))]
+        // [OpenApiParameter("Registration Details", In = ParameterLocation., Required = false,Type = typeof(Registration))]
+        [OpenApiRequestBody("application/json", typeof(Registration))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "user/registration")] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -30,15 +32,20 @@ namespace CoWinAlert.Function
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             Registration registrationData = JsonConvert.DeserializeObject<Registration>(requestBody);
-            log.LogInformation(JsonConvert.SerializeObject(registrationData));
             
+            
+            
+            //registrationData.PinCode = new List<string>{"120","123d","123456","`12345"};
+            log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));
+            
+
             if(registrationData == null){
                 return new BadRequestObjectResult("No data");
             }
             string responseMessage = $"Hello {registrationData.Name}, ";
             responseMessage += string.IsNullOrEmpty(registrationData.EmailID)
                             ? $"Invalid Email. "
-                            : $"{JsonConvert.SerializeObject(registrationData)}";
+                            : $"{JsonConvert.SerializeObject(registrationData, Formatting.Indented)}";
 
             return new OkObjectResult(responseMessage);
         }

@@ -10,10 +10,11 @@ namespace CoWinAlert.DTO
     public class Registration : TableEntity
     {
         #region Private Members
-        private SearchMode _searchmode;
-        private List<int> _pincodes;
-        private int _yearofBirth;
-        private string _email;
+        private SearchMode _searchmode = SearchMode.Pin;
+        private List<long> _pincodes = new List<long>();
+        private int _yearofBirth = (DateTime.Now.Year - 45);
+        private string _email = "";
+        private string _phone = "";
         #endregion
         
         #region Public Members
@@ -24,7 +25,7 @@ namespace CoWinAlert.DTO
             }
             set{
                 try{
-                    if(Regex.IsMatch(value,@"*@*.*")){
+                    if(Regex.IsMatch(value,@"^[a-z0-9+_.-]+@[a-z0-9.-]+$")){
                         _email = value;
                     }
                     else{
@@ -36,7 +37,11 @@ namespace CoWinAlert.DTO
                 }
             }
         }
-        public int Age{get; set;}
+        public int Age{
+            get{
+                return DateTime.Now.Year - _yearofBirth;
+            }
+        }
         public string SearchByMode{
             get{
                 return _searchmode.ToString();
@@ -46,50 +51,74 @@ namespace CoWinAlert.DTO
                     _searchmode = (SearchMode)Enum.Parse(typeof(SearchMode),value);
                 }
                 catch{
-                    _searchmode = SearchMode.Pin;
+                    ;
                 }
             }
         }
         public int YearofBirth{
-            get{
-                return _yearofBirth;
-            }
             set{
                 try{
-                    if(value <= (DateTime.Now.Year - 45)){
-                        Age = 45;
-                    }
-                    else if(value <= (DateTime.Now.Year - 18) 
-                            && value > (DateTime.Now.Year - 45)){
-                        Age = 18;
-                    }
-                    else{
-                        Age = -1;
+                    if(Regex.IsMatch(value.ToString(),@"^19[0-9]{2}")){
+                        _yearofBirth = value;
                     }
                 }
                 catch{
-                    Age = 45;
-                }
-                _yearofBirth = value;         
+                    ;
+                }        
             }
         }
-        public List<int> PinCode{
+        public List<string> PinCode{
             get{
-                return _pincodes;
+                return _pincodes.Select(_code => _code.ToString()).ToList();
             }
             set{
                 try{
                     _pincodes = value.Where(_code => 
-                                    Regex.IsMatch(_code.ToString(), @"[0-9]^6")
-                                )
-                                .ToList();
+                                        Regex.IsMatch(_code, @"^[0-9]{6}")
+                                        )
+                                        .Select(_codes => Int64.Parse(_codes))
+                                        .ToList();
                 }
                 catch{
-                    value = new List<int>();
+                    value = new List<string>();
                 }
             }
         }
+        public string Phone{
+            get{
+                return _phone;
+            }
+            set{
+                try{
+                    if(Regex.IsMatch(value.ToString(),@"^[0-9]{10}")){
+                        _phone = value;
+                    }
+                }
+                catch{
+                    ;
+                }        
+            }
+        }
         #endregion Public Members
+
+        #region Public Functions
+        // public Registration(){
+        //     // Name Valid?
+        //     if(! String.IsNullOrEmpty(Name)){
+        //         _isValid = true;
+        //     }
+
+        //     // Email Valid ?
+        //     if(! String.IsNullOrEmpty(_email)){
+        //         _isValid = true;
+        //     }
+
+        //     // Age Valid ?
+
+        // }
+
+        
+        #endregion Public Functions
     }
     public enum SearchMode{
         Pin,
