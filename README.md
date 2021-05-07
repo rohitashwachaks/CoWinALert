@@ -1,6 +1,10 @@
 # CoWinALert
 Queries CoWin and notifies user if slot opens up
 
+Swagger Endpoint:
+```
+[Swagger Endpoint]{https://cowin-alert.azurewebsites.net/api/swagger/ui?code=iA8UBiyrJn5CAXaKuOQ8KehuJVpz6p/GU/gRfaEgEYEa75LUlcUkEA==}
+```
 Input Format for User Registration:
 
 ```

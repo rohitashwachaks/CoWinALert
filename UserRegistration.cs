@@ -25,7 +25,7 @@ namespace CoWinAlert.Function
         [OpenApiRequestBody("application/json", typeof(Registration))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
         public static async Task<HttpResponseMessage> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "user/registration")] HttpRequest req,
             ILogger log)
         {
             string responseMessage = $"Hello ";
