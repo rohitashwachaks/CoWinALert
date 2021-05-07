@@ -79,8 +79,8 @@ namespace CoWinAlert.Function
             
             
             responseMessage += registrationData.isValid()
-                            ? $"Invalid Data"
-                            : $"Your details have been registered. You will recieve notifications on {registrationData.EmailID}";
+                            ? $"Your details have been registered. You will recieve notifications on {registrationData.EmailID}"
+                            : "Invalid Data";
 
             return HttpResponseHandler.StructureResponse(content: responseMessage,
                                                         code: HttpStatusCode.OK 

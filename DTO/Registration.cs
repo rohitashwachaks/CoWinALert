@@ -12,12 +12,15 @@ namespace CoWinAlert.DTO
     {
         #region Private Members
         private bool _isValid = true;
+        //private DateRangeDTO _dateRange = new DateRangeDTO();
         private List<long> _pincodes = new List<long>();
+        private List<int> _districtcodes = new List<int>();
         private int _yearofBirth = (DateTime.Now.Year - 45);
         private string _name = "";
         private string _email = "";
         private string _phone = "";
-        #endregion
+        
+        #endregion Private Members
         
         #region Public Members
         public string Name{
@@ -56,25 +59,10 @@ namespace CoWinAlert.DTO
                 }
             }
         }
-        public int Age{
-            get{
-                return DateTime.Now.Year - _yearofBirth;
-            }
-        }
-        // public string SearchByMode{
-        //     get{
-        //         return _searchmode.ToString();
-        //     }
-        //     set{
-        //         try{
-        //             _searchmode = (SearchMode)Enum.Parse(typeof(SearchMode),value);
-        //         }
-        //         catch{
-        //             _isValid = false;
-        //         }
-        //     }
-        // }
         public int YearofBirth{
+            get{
+                return _yearofBirth;
+            }
             set{
                 try{
                     if(Regex.IsMatch(value.ToString(),@"^19[0-9]{2}")){
@@ -89,6 +77,8 @@ namespace CoWinAlert.DTO
                 }        
             }
         }
+        public DateRangeDTO PeriodDate{get;set;}
+        [JsonIgnore]
         public List<long> Codes{
             get{
                 return _pincodes;
@@ -97,10 +87,40 @@ namespace CoWinAlert.DTO
         public string PinCode{
             set{
                 try{
-                    _pincodes = JsonConvert.DeserializeObject<List<long>>(value)
+                    
+                    // _pincodes = JsonConvert.DeserializeObject<List<long>>(value)
+                    //                     .Where(_code => 
+                    //                         Regex.IsMatch(_code.ToString(), @"^[0-9]{6}$")
+                    //                     ).ToList();
+                    _pincodes = value.Split(",")
+                                        .Where(_code => Regex.IsMatch(_code.ToString(), @"^[0-9]{6}$"))
+                                        .Select(_code => long.Parse(_code))
+                                        .ToList();
+                    if(_pincodes.Count == 0){
+                        _isValid = false;
+                    }
+                }
+                catch{
+                    _isValid = false;
+                }
+            }
+        }
+        [JsonIgnore]
+        public List<int> District{
+            get{
+                return _districtcodes;
+            }
+        }
+        public string DistrictCode{
+            set{
+                try{
+                    // _districtcodes = JsonConvert.DeserializeObject<List<int>>(value)
+                    _districtcodes = value.Split(",")
                                         .Where(_code => 
-                                            Regex.IsMatch(_code.ToString(), @"^[0-9]{6}")
-                                        ).ToList();
+                                            Regex.IsMatch(_code.ToString(), @"^[0-9]+$")
+                                        )
+                                        .Select(_code => int.Parse(_code))
+                                        .ToList();
                     if(_pincodes.Count == 0){
                         _isValid = false;
                     }
@@ -128,14 +148,12 @@ namespace CoWinAlert.DTO
                 }        
             }
         }
+        [JsonIgnore]
         public Vaccine Vaccine{ get; set;}
         
         #endregion Public Members
 
         #region Public Functions        
-        // public void Initialise(Vaccine vaccineName){
-        //     _vaccine = vaccineName;
-        // }
         public bool isValid(){
                 return _isValid;
         }
@@ -144,24 +162,36 @@ namespace CoWinAlert.DTO
     }
     public class RegistrationTableSchema : TableEntity{
         public string Name{get;set;}
-        public int Age{get;set;}
+        public int YearofBirth{get;set;}
+        public string PeriodDate{get;set;}
         public string PinCode{get;set;}
+        public string DistrictCode{get;set;}
         public string Phone{get;set;}
         public bool isActive{get;set;}
         public RegistrationTableSchema(){}
-        public RegistrationTableSchema(Registration inp){
+        public RegistrationTableSchema(Registration inp, bool isStatusActive = true){
             this.PartitionKey = inp.Vaccine.ToString();
             this.RowKey = inp.EmailID;
             this.Phone = inp.Phone;
             this.Name = inp.Name;
-            this.Age = inp.Age;
+            this.YearofBirth = inp.YearofBirth;
+            this.PeriodDate = JsonConvert.SerializeObject(inp.PeriodDate);
             this.PinCode = JsonConvert.SerializeObject(inp.Codes);
-            this.isActive = true;
+            this.DistrictCode = JsonConvert.SerializeObject(inp.District);
+            this.isActive = isStatusActive;
         }
     }
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Vaccine{
         covishield,
         covaxin
+    }
+    public class DateRangeDTO{
+        public DateTime StartDate{get;set;}
+        public DateTime EndDate{get;set;}
+        public DateRangeDTO(){
+            StartDate = DateTime.Now;
+            EndDate = DateTime.Now;
+        }
     }
 }

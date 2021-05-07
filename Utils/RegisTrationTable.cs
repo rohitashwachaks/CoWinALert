@@ -53,34 +53,57 @@ namespace CoWinAlert.Utils
             }
             return responseMessage;
         }
-        // public static Registration FetchUsers(string vaccineName)
-        // {
-        //     string filter = TableQuery.GenerateFilterConditionForBool("isActive",
-        //                                                                 QueryComparisons.Equal,
-        //                                                                 true
-        //                                                             );
-        //     if(!String.IsNullOrEmpty(vaccineName)){
-        //         string vaccineFilter = TableQuery.GenerateFilterCondition("PartitionKey",
-        //                                                         QueryComparisons.Equal,
-        //                                                         vaccineName
-        //                                                     );
-        //         filter = TableQuery.CombineFilters(vaccineFilter, TableOperators.And, filter);
-        //     }
+        public static IEnumerable<Registration> FetchUsers(string vaccineName = null)
+        {
+            string filter = TableQuery.GenerateFilterConditionForBool("isActive",
+                                                                        QueryComparisons.Equal,
+                                                                        true
+                                                                    );
+            if(!String.IsNullOrEmpty(vaccineName)){
+                string vaccineFilter = TableQuery.GenerateFilterCondition("PartitionKey",
+                                                                QueryComparisons.Equal,
+                                                                vaccineName
+                                                            );
+                filter = TableQuery.CombineFilters(vaccineFilter, TableOperators.And, filter);
+            }
             
-        //     TableQuery tableQuery = new TableQuery().Where(filter);
+            TableQuery tableQuery = new TableQuery().Where(filter);
             
-        //     List<Registration> queriedResponse = registrationTable.ExecuteQuery(tableQuery)
-        //                                                     .Select( _item => new Registration(){
-        //                                                         Name = _item.Properties.ContainsKey("Name") ? _item.Properties["Name"].StringValue : null,
-        //                                                         EmailID = _item.Properties.ContainsKey("EmailID") ? _item.Properties["EmailID"].StringValue : null,
-        //                                                         YearofBirth = (int)(_item.Properties.ContainsKey("Age") ? DateTime.Now.Year -  _item.Properties["Age"].Int32Value : 45),
-        //                                                         Phone = ,
-        //                                                         PinCode = ,
-        //                                                     }.Initialise((Vaccine)Enum.Parse(typeof(Vaccine), _item.PartitionKey))
-        //                                                     ).ToList()
-        //                                                     .Count;
-            
-        // }
+            try
+            {
+                IEnumerable<Registration> queriedResponse = registrationTable.ExecuteQuery(tableQuery)
+                                                    .Select( _item => new Registration(){
+                                                        Vaccine = String.IsNullOrEmpty(_item.PartitionKey) ? 
+                                                                                    Vaccine.covishield
+                                                                                    : (Vaccine)Enum.Parse(typeof(Vaccine), _item.PartitionKey),
+                                                        EmailID = String.IsNullOrEmpty(_item.RowKey) ? 
+                                                                                    null
+                                                                                    : _item.RowKey,
+                                                        Name = _item.Properties.ContainsKey("Name") ?
+                                                                                    _item.Properties["Name"].StringValue 
+                                                                                    : null,
+                                                        PeriodDate = _item.Properties.ContainsKey("PeriodDate") ?
+                                                                                    JsonConvert.DeserializeObject<DateRangeDTO>(_item.Properties["PeriodDate"].StringValue) 
+                                                                                    : new DateRangeDTO(){},
+                                                        YearofBirth = (int)(_item.Properties.ContainsKey("YearofBirth") ?
+                                                                                    _item.Properties["YearofBirth"].Int32Value 
+                                                                                    : DateTime.Now.Year - 45),
+                                                        Phone = _item.Properties.ContainsKey("Phone") ?
+                                                                                    _item.Properties["Phone"].StringValue 
+                                                                                    : null,
+                                                        PinCode = _item.Properties.ContainsKey("PinCode") ?
+                                                                                    _item.Properties["PinCode"].StringValue 
+                                                                                    : null,
+                                                        DistrictCode = _item.Properties.ContainsKey("DistrictCode") ?
+                                                                                    _item.Properties["DistrictCode"].StringValue 
+                                                                                    : null
+                                                    });
+                return queriedResponse;
+            }
+            catch{
+                return new List<Registration>().AsEnumerable();
+            }
+        }
 
     }
 }
