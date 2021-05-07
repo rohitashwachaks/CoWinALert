@@ -74,7 +74,7 @@ namespace CoWinAlert.Utils
                 IEnumerable<Registration> queriedResponse = registrationTable.ExecuteQuery(tableQuery)
                                                     .Select( _item => new Registration(){
                                                         Vaccine = String.IsNullOrEmpty(_item.PartitionKey) ? 
-                                                                                    Vaccine.covishield
+                                                                                    Vaccine.any
                                                                                     : (Vaccine)Enum.Parse(typeof(Vaccine), _item.PartitionKey),
                                                         EmailID = String.IsNullOrEmpty(_item.RowKey) ? 
                                                                                     null

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
@@ -12,7 +13,6 @@ namespace CoWinAlert.DTO
     {
         #region Private Members
         private bool _isValid = true;
-        //private DateRangeDTO _dateRange = new DateRangeDTO();
         private List<long> _pincodes = new List<long>();
         private List<int> _districtcodes = new List<int>();
         private int _yearofBirth = (DateTime.Now.Year - 45);
@@ -87,11 +87,6 @@ namespace CoWinAlert.DTO
         public string PinCode{
             set{
                 try{
-                    
-                    // _pincodes = JsonConvert.DeserializeObject<List<long>>(value)
-                    //                     .Where(_code => 
-                    //                         Regex.IsMatch(_code.ToString(), @"^[0-9]{6}$")
-                    //                     ).ToList();
                     _pincodes = value.Split(",")
                                         .Where(_code => Regex.IsMatch(_code.ToString(), @"^[0-9]{6}$"))
                                         .Select(_code => long.Parse(_code))
@@ -114,7 +109,6 @@ namespace CoWinAlert.DTO
         public string DistrictCode{
             set{
                 try{
-                    // _districtcodes = JsonConvert.DeserializeObject<List<int>>(value)
                     _districtcodes = value.Split(",")
                                         .Where(_code => 
                                             Regex.IsMatch(_code.ToString(), @"^[0-9]+$")
@@ -183,7 +177,8 @@ namespace CoWinAlert.DTO
     }
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Vaccine{
-        covishield,
+        any,
+        covisheild,
         covaxin
     }
     public class DateRangeDTO{
