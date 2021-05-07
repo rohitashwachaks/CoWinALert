@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace CoWinAlert.DTO
 {
@@ -16,7 +17,7 @@ namespace CoWinAlert.DTO
         private string _name = "";
         private string _email = "";
         private string _phone = "";
-        private Vaccine _vaccine = Vaccine.Invalid;
+        private Vaccine _vaccine;
         #endregion
         
         #region Public Members
@@ -148,24 +149,24 @@ namespace CoWinAlert.DTO
         
         #endregion Public Functions
     }
-    public enum Vaccine{
-        CoviShield,
-        Covaxin,
-        Invalid
-    }
     public class RegistrationTableSchema : TableEntity{
+        public string Name{get;set;}
+        public int Age{get;set;}
+        public string PinCode{get;set;}
+        public string Phone{get;set;}
+        public RegistrationTableSchema(){}
         public RegistrationTableSchema(Registration inp){
             this.PartitionKey = inp.Vaccine.ToString();
             this.RowKey = inp.EmailID;
             this.Phone = inp.Phone;
             this.Name = inp.Name;
-            this.Age = inp.Age.ToString();
+            this.Age = inp.Age;
             this.PinCode = JsonConvert.SerializeObject(inp.Codes);
         }
-        public string Name;
-        public string Age;
-        public string PinCode;
-        public string Phone;
-
+    }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum Vaccine{
+        covishield,
+        covaxin
     }
 }

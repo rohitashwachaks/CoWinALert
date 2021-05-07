@@ -11,7 +11,10 @@ namespace CoWinAlert.Utils
         private static CloudTable registrationTable;
         public static void InitialiseConfig(){
             CloudStorageAccount account = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
+            
             var client = account.CreateCloudTableClient();
+            var x = account.TableEndpoint;
+            
             registrationTable = client.GetTableReference("UserRegistration");
         }
         public static bool isUserExisting(Registration user){
@@ -36,9 +39,10 @@ namespace CoWinAlert.Utils
             string responseMessage = "\nUser Added Succesfully.\n";
             try{
                 RegistrationTableSchema reg = new RegistrationTableSchema(user);
-                TableOperation tableOperation = TableOperation.Insert(reg);
+                TableOperation tableOperation = TableOperation.InsertOrReplace(reg);
                 
                 registrationTable.Execute(tableOperation);
+                responseMessage = JsonConvert.SerializeObject(reg, Formatting.Indented);
             }
             catch(Exception ex){
                 responseMessage = JsonConvert.SerializeObject(ex)+"\n";
