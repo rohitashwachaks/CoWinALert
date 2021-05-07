@@ -17,7 +17,6 @@ namespace CoWinAlert.DTO
         private string _name = "";
         private string _email = "";
         private string _phone = "";
-        private Vaccine _vaccine;
         #endregion
         
         #region Public Members
