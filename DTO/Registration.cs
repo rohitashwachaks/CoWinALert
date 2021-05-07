@@ -178,7 +178,7 @@ namespace CoWinAlert.DTO
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Vaccine{
         any,
-        covisheild,
+        covishield,
         covaxin
     }
     public class DateRangeDTO{
