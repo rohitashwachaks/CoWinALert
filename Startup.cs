@@ -7,6 +7,7 @@ namespace CoWinAlert
     public class Startup: FunctionsStartup{
         public override void Configure(IFunctionsHostBuilder builder){
             TableInfo.InitialiseConfig();
+            PingCoWin.Initialise();
         }
     }
 }
