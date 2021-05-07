@@ -19,13 +19,13 @@ namespace CoWinAlert.Function
     public static class UserRegistration
     {
         ///Function to Register Users and their Preferences
-        [FunctionName("UserRegistration")]
+        [FunctionName("user-registration")]
         [OpenApiOperation]
         [OpenApiParameter("vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(Vaccine))]
         [OpenApiRequestBody("application/json", typeof(Registration))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
         public static async Task<HttpResponseMessage> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "user/registration")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             string responseMessage = $"Hello ";
