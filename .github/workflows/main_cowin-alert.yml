@@ -39,5 +39,5 @@ jobs:
         app-name: 'cowin-alert'
         slot-name: 'production'
         package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_3b5994a886c14a9d987167cbcf012e90 }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_340951a8c87b4c4099bfa1f5e9aabb47 }}
   
