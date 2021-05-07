@@ -9,6 +9,7 @@ using CoWinAlert.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CoWinAlert.Function
 {
@@ -21,12 +22,14 @@ namespace CoWinAlert.Function
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now.ToShortDateString()}");
             foreach(Registration user in TableInfo.FetchUsers()){
                 log.LogInformation(JsonConvert.SerializeObject(user, Formatting.Indented));
-                IEnumerable<HttpResponseMessage> response = await PingCoWin.GetResultAsync(new List<DateTime>(){DateTime.Now}, 
-                                                                                    user.Codes,
-                                                                                    user.District);
-                foreach(HttpResponseMessage message in response){
-                    log.LogInformation(JsonConvert.SerializeObject(message, Formatting.Indented));
+                IEnumerable<JObject> response = new List<JObject>();
+                await foreach(string message in PingCoWin.GetResultAsync(
+                                                            new List<DateTime>(){DateTime.Now}, 
+                                                            user.Codes,
+                                                            user.District)){
+                    response = response.Append(JsonConvert.DeserializeObject<JObject>(message));
                 }
+                log.LogInformation(JsonConvert.SerializeObject(response, Formatting.Indented));
             }
         }
     }

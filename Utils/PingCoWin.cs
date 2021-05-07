@@ -27,19 +27,15 @@ namespace CoWinAlert.Utils
             client.DefaultRequestHeaders.Accept.Clear();
         }
         #region Structure URLS
-        // private static string findByDistrict = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict?";
-        // private static string findByPin = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByPin?";
-        // private static string calendarByDistrict = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?";
-        // private static string calendarByPin = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?";
-        public static Task<HttpResponseMessage> FindByDistrict(int district_id, DateTime date)
+        public static async Task<HttpResponseMessage> FindByDistrict(int district_id, DateTime date)
         {
             string url = PingAction.FindByDistrict.ToDescriptionString()+$"district_id={district_id.ToString()}&date={date.ToShortDateString()}";
-            return client.GetAsync(url);
+            return await client.GetAsync(url);
         }
-        public static Task<HttpResponseMessage> FindByPin(long pincode, DateTime date)
+        public static async Task<HttpResponseMessage> FindByPin(long pincode, DateTime date)
         {
             string url = PingAction.FindByPin.ToDescriptionString()+$"pincode={pincode.ToString()}&date={date.ToShortDateString()}";
-            return client.GetAsync(url);
+            return await client.GetAsync(url);
         }
         public static Task<HttpResponseMessage> CalendarByDistrict(int district_id, DateTime date)
         {
@@ -53,9 +49,7 @@ namespace CoWinAlert.Utils
         }
         #endregion Structure URLS
         #region Async Calls
-        public static async Task<IEnumerable<HttpResponseMessage>> GetResultAsync(
-                                            // HttpClient client,
-                                            // PingAction actionName, 
+        public static async IAsyncEnumerable<string> GetResultAsync(
                                             List<DateTime> dateTimes,
                                             List<long> pincodes,
                                             List<int> district_id
@@ -66,20 +60,19 @@ namespace CoWinAlert.Utils
                 
                 IEnumerable<Task<HttpResponseMessage>> lstPin = from param in pincodes select FindByPin(param, date);
                 IEnumerable<Task<HttpResponseMessage>> lstDist = from param in district_id select FindByDistrict(param, date);
-
-                lstResponse.Concat(lstPin);
-                lstResponse.Concat(lstDist);
-                // foreach(long code in pincodes){
-                //     lstResponse.Append(FindByPin(code, date));
-                // }
-                // foreach(int id in district_id){
-                //     lstResponse.Append(FindByDistrict(id, date));
-                // }
+                lstResponse = lstResponse.Concat(lstPin);
+                lstResponse = lstResponse.Concat(lstDist);
             }
             int x = lstResponse.Count();
             IEnumerable<HttpResponseMessage> responses = await Task.WhenAll(lstResponse);
 
-            return responses;
+            foreach(HttpResponseMessage responseMessage in responses)
+            {
+                if(responseMessage.IsSuccessStatusCode)
+                {
+                    yield return await responseMessage.Content.ReadAsStringAsync();
+                }
+            }
         }
         #endregion Async Calls
         public static string ToDescriptionString(this PingAction val)
