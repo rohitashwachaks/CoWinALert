@@ -98,11 +98,10 @@ namespace CoWinAlert.DTO
         public string PinCode{
             set{
                 try{
-                    _pincodes = JsonConvert.DeserializeObject<List<string>>(value)
+                    _pincodes = JsonConvert.DeserializeObject<List<long>>(value)
                                         .Where(_code => 
-                                            Regex.IsMatch(_code, @"^[0-9]{6}")
-                                        ).Select(_codes => Int64.Parse(_codes))
-                                        .ToList();
+                                            Regex.IsMatch(_code.ToString(), @"^[0-9]{6}")
+                                        ).ToList();
                     if(_pincodes.Count == 0){
                         _isValid = false;
                     }
@@ -130,21 +129,16 @@ namespace CoWinAlert.DTO
                 }        
             }
         }
-        public Vaccine Vaccine{
-            get{
-                return _vaccine;
-            }
-        }
-        public bool isValid{
-            get{
-                return _isValid;
-            }
-        }
+        public Vaccine Vaccine{ get; set;}
+        
         #endregion Public Members
 
         #region Public Functions        
-        public void Initialise(Vaccine vaccineName){
-            _vaccine = vaccineName;
+        // public void Initialise(Vaccine vaccineName){
+        //     _vaccine = vaccineName;
+        // }
+        public bool isValid(){
+                return _isValid;
         }
         
         #endregion Public Functions
@@ -154,6 +148,7 @@ namespace CoWinAlert.DTO
         public int Age{get;set;}
         public string PinCode{get;set;}
         public string Phone{get;set;}
+        public bool isActive{get;set;}
         public RegistrationTableSchema(){}
         public RegistrationTableSchema(Registration inp){
             this.PartitionKey = inp.Vaccine.ToString();
@@ -162,6 +157,7 @@ namespace CoWinAlert.DTO
             this.Name = inp.Name;
             this.Age = inp.Age;
             this.PinCode = JsonConvert.SerializeObject(inp.Codes);
+            this.isActive = true;
         }
     }
     [JsonConverter(typeof(StringEnumConverter))]

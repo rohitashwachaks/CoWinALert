@@ -18,6 +18,7 @@ namespace CoWinAlert.Function
 {
     public static class UserRegistration
     {
+        ///Function to Register Users and their Preferences
         [FunctionName("UserRegistration")]
         [OpenApiOperation]
         [OpenApiParameter("vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(Vaccine))]
@@ -27,9 +28,9 @@ namespace CoWinAlert.Function
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "user/registration")] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation(HttpUtility.HtmlEncode("C# HTTP trigger function processed a request."));
-
+            string responseMessage = $"Hello ";
             Vaccine vaccineName;
+
             try{
                 string vaccine = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
                 vaccineName = (Vaccine)Enum.Parse(typeof(Vaccine), vaccine);
@@ -42,35 +43,44 @@ namespace CoWinAlert.Function
             }
             
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            Registration registrationData = JsonConvert.DeserializeObject<Registration>(requestBody);
-            registrationData.Initialise(vaccineName);
-            // registrationData.PinCode = "[\"120\",\"123d\",\"123456\",\"`12345\"]";
-            log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));            
-
+            
+            if(requestBody == null){
+                log.LogError("No Data in request Body");
+                return HttpResponseHandler.StructureResponse(content: "No data",
+                                                        code: HttpStatusCode.BadRequest 
+                                                    );
+            }
+            
+            Registration registrationData = new Registration();
+            
             try{
+                registrationData = JsonConvert.DeserializeObject<Registration>(requestBody);
+                registrationData.Vaccine = vaccineName;
+
+                log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));
+                responseMessage += $"{registrationData.Name}, ";
+
                 // Check if it exists in table
-                if(TableInfo.isUserExisting(registrationData)){
+                if(TableInfo.isUserExisting(registrationData) &&
+                    registrationData.isValid()
+                ){
                     // Add to Table
                     string x = TableInfo.AddRowtoTable(registrationData);
                     log.LogInformation(x);
                 }
             }
             catch(Exception ex){
+                log.LogError(ex.Message);
                 return HttpResponseHandler.StructureResponse(reason: ex.Message,
                                                         content: ex.StackTrace,
                                                         code: HttpStatusCode.InternalServerError 
                                                     );
             }            
             
-            if(registrationData == null){
-                return HttpResponseHandler.StructureResponse(content: "No data",
-                                                        code: HttpStatusCode.BadRequest 
-                                                    );
-            }
-            string responseMessage = $"Hello {registrationData.Name}, ";
-            responseMessage += string.IsNullOrEmpty(registrationData.EmailID)
-                            ? $"Invalid Email. "
-                            : $"{JsonConvert.SerializeObject(registrationData, Formatting.None)}";
+            
+            responseMessage += registrationData.isValid()
+                            ? $"Invalid Data"
+                            : $"Your details have been registered. You will recieve notifications on {registrationData.EmailID}";
 
             return HttpResponseHandler.StructureResponse(content: responseMessage,
                                                         code: HttpStatusCode.OK 
