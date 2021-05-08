@@ -22,6 +22,7 @@ namespace CoWinAlert.Function
         [FunctionName("user-registration")]
         [OpenApiOperation]
         [OpenApiParameter("vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(Vaccine))]
+        [OpenApiParameter("payment", In = ParameterLocation.Query, Required = true, Type = typeof(FeeTypeDTO))]
         [OpenApiRequestBody("application/json", typeof(RegistrationDTO))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
         public static async Task<HttpResponseMessage> RunAsync(
@@ -30,12 +31,14 @@ namespace CoWinAlert.Function
         {
             string responseMessage = $"Hello ";
             string vaccineName = "";
+            string payment = "";
 
             try{
                 vaccineName = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
+                payment = HttpUtility.HtmlEncode(req.Query["payment"].ToString());
             }
             catch(Exception ex){
-                return HttpResponseHandler.StructureResponse(reason: "Invalid Vaccine Name",
+                return HttpResponseHandler.StructureResponse(reason: "Invalid Query Parameters",
                                                         content: ex.StackTrace,
                                                         code: HttpStatusCode.InternalServerError 
                                                     );
@@ -55,6 +58,7 @@ namespace CoWinAlert.Function
             try{
                 registrationData = JsonConvert.DeserializeObject<RegistrationDTO>(requestBody);
                 registrationData.Vaccine = vaccineName;
+                registrationData.Payment = payment;
 
                 log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));
                 responseMessage += $"{registrationData.Name}, ";

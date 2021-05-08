@@ -51,8 +51,8 @@ namespace CoWinAlert.Utils
         }
         #endregion Structure URLS
         #region Async Calls
-        public static async IAsyncEnumerable<string> GetResultAsync(
-                                            List<DateTime> dateTimes,
+        public static async IAsyncEnumerable<SessionCalendarDTO> GetResultAsync(
+                                            IEnumerable<DateTime> dateTimes,
                                             List<long> pincodes,
                                             List<int> district_id
                                         )
@@ -73,7 +73,14 @@ namespace CoWinAlert.Utils
                 if(responseMessage.IsSuccessStatusCode)
                 {
                     string jsonString = await responseMessage.Content.ReadAsStringAsync();
-                    yield return GetFilteredResult(jsonString);
+                    CentersDTO centerLst = JsonConvert.DeserializeObject<CentersDTO>(jsonString);
+                    foreach(SessionCalendarDTO center in centerLst.Centers)
+                    {
+                        yield return center;
+                    }
+                    // List<SessionCalendarDTO> centers = JsonConvert.DeserializeObject<List<SessionCalendarDTO>>(jsonString);
+
+                    // yield return centers;
                 }
             }
         }
@@ -89,15 +96,22 @@ namespace CoWinAlert.Utils
         }
         #endregion Helper Functions
         #region Filter Responses
-        public static string GetFilteredResult(string inputString)
+        public static ResponseDTO GetFilteredResult(CentersDTO centers, RegistrationDTO user)
         {
             try
             {
-                CentersDTO sessionCalendar = JsonConvert.DeserializeObject<CentersDTO>(inputString);
-                return JsonConvert.SerializeObject(sessionCalendar);
+                ResponseDTO filteredResponse = new ResponseDTO();
+
+                // if()
+                foreach(SessionCalendarDTO calendar in centers.Centers)
+                {
+                    ;
+                }
+
+                return filteredResponse;
             }
             catch(Exception ex){
-                return "{\"message\":\"Parsing Error\"}";
+                return new ResponseDTO();;
             }
         }
         #endregion Filter Responses

@@ -73,14 +73,9 @@ namespace CoWinAlert.DTO
     }
     public class ResponseDTO
     {
-        
+        public List<string> Slots{get;set;}
     }
-    public enum FeeTypeDTO
-    {
-        FREE,
-        PAID
     }
-}
 /**
 {
   "sessions": [

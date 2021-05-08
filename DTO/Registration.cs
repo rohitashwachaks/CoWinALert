@@ -15,6 +15,7 @@ namespace CoWinAlert.DTO
         private bool _isValid = true;
         private string _reasonPhrase = "";
         private Vaccine _vaccine = DTO.Vaccine.ANY;
+        private FeeTypeDTO _payment = DTO.FeeTypeDTO.ANY;
         private List<long> _pincodes = new List<long>();
         private List<int> _districtcodes = new List<int>();
         private int _yearofBirth = (DateTime.Now.Year - 45);
@@ -167,7 +168,27 @@ namespace CoWinAlert.DTO
                 }
             }
         }
-        
+        [JsonIgnore]
+        public string Payment
+        {
+            get
+            {
+                return _payment.ToString();
+            }
+            set
+            {
+                try
+                {
+                    _payment = (FeeTypeDTO)Enum.Parse(typeof(FeeTypeDTO), value.ToUpper());
+                }
+                catch
+                {
+                    _isValid = false;
+                    _reasonPhrase += $"\nError in Payment Parsing. Input value = {value}";
+                }
+            }
+        }
+
         #endregion Public Members
 
         #region Public Functions        
@@ -186,6 +207,7 @@ namespace CoWinAlert.DTO
         public string PinCode{get;set;}
         public string DistrictCode{get;set;}
         public string Phone{get;set;}
+        public string Payment{get;set;}
         public bool isActive{get;set;}
         public RegistrationTableSchemaDTO(){}
         public RegistrationTableSchemaDTO(RegistrationDTO inp, bool isStatusActive = true){
@@ -197,6 +219,7 @@ namespace CoWinAlert.DTO
             this.PeriodDate = JsonConvert.SerializeObject(inp.PeriodDate);
             this.PinCode = JsonConvert.SerializeObject(inp.Codes);
             this.DistrictCode = JsonConvert.SerializeObject(inp.District);
+            this.Payment = inp.Payment;
             this.isActive = isStatusActive;
         }
     }
@@ -206,6 +229,14 @@ namespace CoWinAlert.DTO
         COVISHIELD,
         COVAXIN
     }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum FeeTypeDTO
+    {
+        ANY,
+        FREE,
+        PAID
+    }
+
     public class DateRangeDTO{
         public DateTime StartDate{get;set;}
         public DateTime EndDate{get;set;}

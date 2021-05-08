@@ -21,6 +21,7 @@ namespace CoWinAlert.Function
         [FunctionName("send-Notification")]
         [Disable]
         [OpenApiOperation]
+        [OpenApiIgnore]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
         public static async Task<HttpResponseMessage> RunAsync(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "backend/send-notif")] HttpRequest req,

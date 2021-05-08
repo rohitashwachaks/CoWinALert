@@ -79,6 +79,9 @@ namespace CoWinAlert.Utils
                                                         EmailID = String.IsNullOrEmpty(_item.RowKey) ? 
                                                                                     null
                                                                                     : _item.RowKey,
+                                                        Payment = _item.Properties.ContainsKey("Payment") ? 
+                                                                                    _item.Properties["Payment"].StringValue
+                                                                                    :"ANY",
                                                         Name = _item.Properties.ContainsKey("Name") ?
                                                                                     _item.Properties["Name"].StringValue 
                                                                                     : null,
