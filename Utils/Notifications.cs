@@ -67,16 +67,14 @@ namespace CoWinAlert.Utils
         }
         public static async Task<string> SendEmail(string userName, string userEmail, string htmlContent, string plainContent = "")
         {            
-            // EmailAddress to = new EmailAddress("rajchaks1969@gmail.com", "Papaila");
-            // string plainTextContent = "Trial email! Hello World!";
-            // string htmlContent = "<strong>Coding is easy to do anywhere!</strong>";
+            string responseMessage = "Email Sent Succesfully"
             EmailAddress reciever = StructureEmailID(userName, userEmail);
             SendGridMessage msg = MailHelper.CreateSingleEmail(sender, reciever, EMAIL_SUBJECT, plainContent, htmlContent);
-            Response response = await client.SendEmailAsync(msg);
+            // Response response = await client.SendEmailAsync(msg);
             
-            string responseMessage = (response.IsSuccessStatusCode)?
-                                                        ("Email Sent Succesfully"):
-                                                        (await response.Body.ReadAsStringAsync());
+            // responseMessage = (response.IsSuccessStatusCode)?
+            //                                             responseMessage:
+            //                                             (await response.Body.ReadAsStringAsync());
             return responseMessage;
         }
         #endregion Public Functions
