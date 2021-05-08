@@ -72,7 +72,8 @@ namespace CoWinAlert.Utils
             {
                 if(responseMessage.IsSuccessStatusCode)
                 {
-                    yield return await responseMessage.Content.ReadAsStringAsync();
+                    string jsonString = await responseMessage.Content.ReadAsStringAsync();
+                    yield return GetFilteredResult(jsonString);
                 }
             }
         }
@@ -92,11 +93,11 @@ namespace CoWinAlert.Utils
         {
             try
             {
-                SessionCalendarDTO sessionCalendar = JsonConvert.DeserializeObject<SessionCalendarDTO>(inputString);
+                CentersDTO sessionCalendar = JsonConvert.DeserializeObject<CentersDTO>(inputString);
                 return JsonConvert.SerializeObject(sessionCalendar);
             }
-            catch{
-                return "Parsing Error";
+            catch(Exception ex){
+                return "{\"message\":\"Parsing Error\"}";
             }
         }
         #endregion Filter Responses

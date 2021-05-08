@@ -1,25 +1,36 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 
 namespace CoWinAlert.DTO
 {
     public class VaccineFeeDTO
     {
-        public static string vaccine{get;set;}
-        public static string fee{get;set;}
+        public string vaccine{get;set;}
+        public string fee{get;set;}
     }
     public class SessionDTO{
-        private static Vaccine _vaccine = DTO.Vaccine.ANY;
-        public static string Session_id{get; set;}
-        public static DateTime Date{get; set;}
-        public static int Available_capacity{get; set;}
-        public static int Min_age_limit{get; set;}
-        public static string Vaccine
+        private DateTime _date = DateTime.Now;
+        private Vaccine _vaccine = DTO.Vaccine.ANY;
+        public string Session_id{get; set;}
+        
+        public DateTime SessionDate{
+            get
+            {
+                return _date;
+            }
+        }
+        public string Date
+        {            
+            set
+            {
+                _date = DateTime.Parse(value);//DateTime.ParseExact(value, "mm-dd-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+            }
+        }
+        public int Available_capacity{get; set;}
+        public int Min_age_limit{get; set;}
+        public string Vaccine
         {
             get
             {
@@ -37,28 +48,32 @@ namespace CoWinAlert.DTO
                 }
             }
         }
-        public static List<string> Slots{get; set;}
+        public List<string> Slots{get; set;}
     }
     public class SessionCalendarDTO
     {
-        public static string Center_id{get;set;}
-        public static string Name{get;set;}
-        public static string Address{get; set;}
-        public static string State_name{get; set;}
-        public static string District_name{get; set;}
-        public static string Block_name{get; set;}
-        public static long Pincode{get; set;}
-        public static double Lat{get; set;}
-        public static double Long{get; set;}
-        public static DateTimeOffset From{get; set;}
-        public static DateTimeOffset To{get; set;}
-        public static FeeTypeDTO Fee_type{get; set;}
-        public static List<VaccineFeeDTO> Vaccine_fees{get; set;}
-        public static List<SessionDTO> Sessions{get; set;}
+        public string Center_id{get;set;}
+        public string Name{get;set;}
+        public string Address{get; set;}
+        public string State_name{get; set;}
+        public string District_name{get; set;}
+        public string Block_name{get; set;}
+        public long Pincode{get; set;}
+        public double Lat{get; set;}
+        public double Long{get; set;}
+        public DateTime From{get; set;}
+        public DateTime To{get; set;}
+        public FeeTypeDTO Fee_type{get; set;}
+        public List<VaccineFeeDTO> Vaccine_fees{get; set;}
+        public List<SessionDTO> Sessions{get; set;}
+    }
+    public class CentersDTO
+    {
+        public List<SessionCalendarDTO> Centers{get; set;}
     }
     public class ResponseDTO
     {
-
+        
     }
     public enum FeeTypeDTO
     {
