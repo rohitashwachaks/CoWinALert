@@ -53,7 +53,7 @@ namespace CoWinAlert.Utils
         //     }
         //     return response;
         // }
-        public static async Task<string> RegisterEmailAsync(Registration user)
+        public static async Task<string> RegisterEmailAsync(RegistrationDTO user)
         {
             string htmlContent = $"Hi {user.Name}!\n"
             +$"Your details have been registered with us.\n"

@@ -22,7 +22,7 @@ namespace CoWinAlert.Function
         {
             log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToShortDateString()}");
             
-            foreach(Registration user in TableInfo.FetchUsers())
+            foreach(RegistrationDTO user in TableInfo.FetchUsers())
             {
                 log.LogInformation(JsonConvert.SerializeObject(user, Formatting.Indented));
                 IEnumerable<JObject> response = new List<JObject>();

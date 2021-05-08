@@ -22,18 +22,17 @@ namespace CoWinAlert.Function
         [FunctionName("user-registration")]
         [OpenApiOperation]
         [OpenApiParameter("vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(Vaccine))]
-        [OpenApiRequestBody("application/json", typeof(Registration))]
+        [OpenApiRequestBody("application/json", typeof(RegistrationDTO))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
         public static async Task<HttpResponseMessage> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "user/registration")] HttpRequest req,
             ILogger log)
         {
             string responseMessage = $"Hello ";
-            Vaccine vaccineName;
+            string vaccineName = "";
 
             try{
-                string vaccine = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
-                vaccineName = (Vaccine)Enum.Parse(typeof(Vaccine), vaccine);
+                vaccineName = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
             }
             catch(Exception ex){
                 return HttpResponseHandler.StructureResponse(reason: "Invalid Vaccine Name",
@@ -51,10 +50,10 @@ namespace CoWinAlert.Function
                                                     );
             }
             
-            Registration registrationData = new Registration();
+            RegistrationDTO registrationData = new RegistrationDTO();
             
             try{
-                registrationData = JsonConvert.DeserializeObject<Registration>(requestBody);
+                registrationData = JsonConvert.DeserializeObject<RegistrationDTO>(requestBody);
                 registrationData.Vaccine = vaccineName;
 
                 log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));
@@ -83,7 +82,7 @@ namespace CoWinAlert.Function
             
             
             responseMessage += registrationData.isValid()
-                            ? $"Your details have been registered. You will recieve notifications on {registrationData.EmailID}\n,"
+                            ? $"Your details have been registered. You will recieve notifications on {registrationData.EmailID},"
                                 +" Remember to check the SPAM FOLDER for mails from captain.nemo.github@gmail.com"
                             : "Invalid Data";
 

@@ -9,10 +9,12 @@ using Newtonsoft.Json.Converters;
 
 namespace CoWinAlert.DTO
 {
-    public class Registration
+    public class RegistrationDTO
     {
         #region Private Members
         private bool _isValid = true;
+        private string _reasonPhrase = "";
+        private Vaccine _vaccine = DTO.Vaccine.ANY;
         private List<long> _pincodes = new List<long>();
         private List<int> _districtcodes = new List<int>();
         private int _yearofBirth = (DateTime.Now.Year - 45);
@@ -38,6 +40,7 @@ namespace CoWinAlert.DTO
                 }
                 catch{
                     _isValid = false;
+                    _reasonPhrase += $"\nError in Name Parsing. Input value = {value}";
                 }
             }
         }
@@ -56,6 +59,7 @@ namespace CoWinAlert.DTO
                 }
                 catch{
                     _isValid = false;
+                    _reasonPhrase += $"\nError in EmailID Parsing. Input value = {value}";
                 }
             }
         }
@@ -74,6 +78,7 @@ namespace CoWinAlert.DTO
                 }
                 catch{
                     _isValid = false;
+                    _reasonPhrase += $"\nError in Year of Birth Parsing. Input value = {value.ToString()}";
                 }        
             }
         }
@@ -96,6 +101,7 @@ namespace CoWinAlert.DTO
                 }
                 catch{
                     _isValid = false;
+                    _reasonPhrase += $"\nError in Pin Code Parsing. Input value = {value}";
                 }
             }
         }
@@ -119,6 +125,7 @@ namespace CoWinAlert.DTO
                 }
                 catch{
                     _isValid = false;
+                    _reasonPhrase += $"\nError in District code Parsing. Input value = {value}";
                 }
             }
         }
@@ -137,11 +144,29 @@ namespace CoWinAlert.DTO
                 }
                 catch{
                     _isValid = false;
+                    _reasonPhrase += $"\nError in Phone Number Parsing. Input value = {value}";
                 }        
             }
         }
         [JsonIgnore]
-        public Vaccine Vaccine{ get; set;}
+        public string Vaccine
+        { get
+            {
+                return _vaccine.ToString();
+            } 
+            set
+            {
+                try
+                {
+                    _vaccine = (Vaccine)Enum.Parse(typeof(Vaccine), value.ToUpper());
+                }
+                catch
+                {
+                    _isValid = false;
+                    _reasonPhrase += $"\nError in Vaccine Parsing. Input value = {value}";
+                }
+            }
+        }
         
         #endregion Public Members
 
@@ -149,10 +174,12 @@ namespace CoWinAlert.DTO
         public bool isValid(){
                 return _isValid;
         }
-        
+        public string InvalidReason(){
+            return _reasonPhrase;
+        }
         #endregion Public Functions
     }
-    public class RegistrationTableSchema : TableEntity{
+    public class RegistrationTableSchemaDTO : TableEntity{
         public string Name{get;set;}
         public int YearofBirth{get;set;}
         public string PeriodDate{get;set;}
@@ -160,8 +187,8 @@ namespace CoWinAlert.DTO
         public string DistrictCode{get;set;}
         public string Phone{get;set;}
         public bool isActive{get;set;}
-        public RegistrationTableSchema(){}
-        public RegistrationTableSchema(Registration inp, bool isStatusActive = true){
+        public RegistrationTableSchemaDTO(){}
+        public RegistrationTableSchemaDTO(RegistrationDTO inp, bool isStatusActive = true){
             this.PartitionKey = inp.Vaccine.ToString();
             this.RowKey = inp.EmailID;
             this.Phone = inp.Phone;
@@ -175,9 +202,9 @@ namespace CoWinAlert.DTO
     }
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Vaccine{
-        any,
-        covishield,
-        covaxin
+        ANY,
+        COVISHIELD,
+        COVAXIN
     }
     public class DateRangeDTO{
         public DateTime StartDate{get;set;}

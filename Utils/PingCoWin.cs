@@ -16,6 +16,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CoWinAlert.DTO;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace CoWinAlert.Utils
@@ -56,10 +58,10 @@ namespace CoWinAlert.Utils
                                         )
         {
             IEnumerable<Task<HttpResponseMessage>> lstResponse = new List<Task<HttpResponseMessage>>();
-            foreach(DateTime date in dateTimes){
-                
-                IEnumerable<Task<HttpResponseMessage>> lstPin = from param in pincodes select FindByPin(param, date);
-                IEnumerable<Task<HttpResponseMessage>> lstDist = from param in district_id select FindByDistrict(param, date);
+            foreach(DateTime date in dateTimes)
+            {
+                IEnumerable<Task<HttpResponseMessage>> lstPin = from param in pincodes select CalendarByPin(param, date);
+                IEnumerable<Task<HttpResponseMessage>> lstDist = from param in district_id select CalendarByDistrict(param, date);
                 lstResponse = lstResponse.Concat(lstPin);
                 lstResponse = lstResponse.Concat(lstDist);
             }
@@ -75,6 +77,7 @@ namespace CoWinAlert.Utils
             }
         }
         #endregion Async Calls
+        #region Helper Functions
         public static string ToDescriptionString(this PingAction val)
         {
             DescriptionAttribute[] attributes = (DescriptionAttribute[])val
@@ -83,6 +86,20 @@ namespace CoWinAlert.Utils
             .GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : string.Empty;
         }
+        #endregion Helper Functions
+        #region Filter Responses
+        public static string GetFilteredResult(string inputString)
+        {
+            try
+            {
+                SessionCalendarDTO sessionCalendar = JsonConvert.DeserializeObject<SessionCalendarDTO>(inputString);
+                return JsonConvert.SerializeObject(sessionCalendar);
+            }
+            catch{
+                return "Parsing Error";
+            }
+        }
+        #endregion Filter Responses
     }
     public enum PingAction{
         [Description("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict?")]
