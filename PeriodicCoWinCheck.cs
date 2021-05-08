@@ -17,6 +17,7 @@ namespace CoWinAlert.Function
     {
         /// Function to periodically ceheck CoWin
         [FunctionName("PeriodicCoWinCheck")]
+        [Disable]
         public static async void Run([TimerTrigger("0 */15 * * * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToShortDateString()}");
