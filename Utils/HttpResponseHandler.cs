@@ -15,7 +15,7 @@ namespace CoWinAlert.Utils
             }
             HttpResponseMessage responseMessage = new HttpResponseMessage();
             responseMessage.ReasonPhrase = reason;
-            responseMessage.Content = new StringContent(JsonConvert.SerializeObject(content));
+            responseMessage.Content = new StringContent(JsonConvert.SerializeObject(content, Formatting.Indented));
             responseMessage.StatusCode = code;
             return responseMessage;
         }
