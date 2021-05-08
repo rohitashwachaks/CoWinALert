@@ -7,6 +7,7 @@ using System;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
+using CoWinAlert.DTO;
 
 namespace CoWinAlert.Utils
 {
@@ -52,7 +53,19 @@ namespace CoWinAlert.Utils
         //     }
         //     return response;
         // }
-        public static async Task<string> SendEmail(string userName, string userEmail, string htmlContent, string plainContent)
+        public static async Task<string> RegisterEmailAsync(Registration user)
+        {
+            string htmlContent = $"Hi {user.Name}!\n"
+            +$"Your details have been registered with us.\n"
+            +$"You will recieve notifications on <strong>{user.EmailID}</strong>";
+            
+
+            return await SendEmail(userName: user.Name,
+                        userEmail: user.EmailID,
+                        htmlContent: htmlContent
+                        );
+        }
+        public static async Task<string> SendEmail(string userName, string userEmail, string htmlContent, string plainContent = "")
         {            
             // EmailAddress to = new EmailAddress("rajchaks1969@gmail.com", "Papaila");
             // string plainTextContent = "Trial email! Hello World!";
