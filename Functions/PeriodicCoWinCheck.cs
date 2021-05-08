@@ -27,7 +27,7 @@ namespace CoWinAlert.Function
         //     ILogger log)
         [FunctionName("PeriodicCoWinCheck")]
         // [Disable]
-        public static async void Run([TimerTrigger("0 */15 * * * *")]TimerInfo myTimer, ILogger log)
+        public static async void Run([TimerTrigger("0 * */1 * * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToShortDateString()}");
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
