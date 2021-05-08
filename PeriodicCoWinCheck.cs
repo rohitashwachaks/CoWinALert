@@ -17,8 +17,8 @@ namespace CoWinAlert.Function
     {
         /// Function to periodically ceheck CoWin
         [FunctionName("PeriodicCoWinCheck")]
-        [Disable]
-        public static async void Run([TimerTrigger("0 */15 * * * *")]TimerInfo myTimer, ILogger log)
+        // [Disable]
+        public static async void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToShortDateString()}");
             
@@ -55,12 +55,12 @@ namespace CoWinAlert.Function
                 }
                 log.LogDebug(JsonConvert.SerializeObject(calendarDates));
                 
-                await foreach(string message in PingCoWin.GetResultAsync(
-                                                            new List<DateTime>(){DateTime.Now}, 
-                                                            user.Codes,
-                                                            user.District)){
-                    response = response.Append(JsonConvert.DeserializeObject<JObject>(message));
-                }
+                // await foreach(string message in PingCoWin.GetResultAsync(
+                //                                             new List<DateTime>(){DateTime.Now}, 
+                //                                             user.Codes,
+                //                                             user.District)){
+                //     response = response.Append(JsonConvert.DeserializeObject<JObject>(message));
+                // }
                 
                 log.LogInformation(JsonConvert.SerializeObject(response, Formatting.Indented));
             }

@@ -67,7 +67,7 @@ namespace CoWinAlert.Utils
         }
         public static async Task<string> SendEmail(string userName, string userEmail, string htmlContent, string plainContent = "")
         {            
-            string responseMessage = "Email Sent Succesfully"
+            string responseMessage = "Email Sent Succesfully";
             EmailAddress reciever = StructureEmailID(userName, userEmail);
             SendGridMessage msg = MailHelper.CreateSingleEmail(sender, reciever, EMAIL_SUBJECT, plainContent, htmlContent);
             // Response response = await client.SendEmailAsync(msg);
