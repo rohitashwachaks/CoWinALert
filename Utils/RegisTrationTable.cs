@@ -19,7 +19,7 @@ namespace CoWinAlert.Utils
             
             registrationTable = client.GetTableReference("UserRegistration");
         }
-        public static bool isUserExisting(Registration user)
+        public static bool isUserExisting(RegistrationDTO user)
         {
             string vaccineFilter = TableQuery.GenerateFilterCondition("PartitionKey",
                                                                 QueryComparisons.Equal,
@@ -38,11 +38,11 @@ namespace CoWinAlert.Utils
                                                             .Count;
             return (queriedResponse == 0);            
         }
-        public static string AddRowtoTable(Registration user)
+        public static string AddRowtoTable(RegistrationDTO user)
         {
             string responseMessage = "\nUser Added Succesfully.\n";
             try{
-                RegistrationTableSchema reg = new RegistrationTableSchema(user);
+                RegistrationTableSchemaDTO reg = new RegistrationTableSchemaDTO(user);
                 TableOperation tableOperation = TableOperation.InsertOrReplace(reg);
                 
                 registrationTable.Execute(tableOperation);
@@ -53,7 +53,7 @@ namespace CoWinAlert.Utils
             }
             return responseMessage;
         }
-        public static IEnumerable<Registration> FetchUsers(string vaccineName = null)
+        public static IEnumerable<RegistrationDTO> FetchUsers(string vaccineName = null)
         {
             string filter = TableQuery.GenerateFilterConditionForBool("isActive",
                                                                         QueryComparisons.Equal,
@@ -71,14 +71,17 @@ namespace CoWinAlert.Utils
             
             try
             {
-                IEnumerable<Registration> queriedResponse = registrationTable.ExecuteQuery(tableQuery)
-                                                    .Select( _item => new Registration(){
+                IEnumerable<RegistrationDTO> queriedResponse = registrationTable.ExecuteQuery(tableQuery)
+                                                    .Select( _item => new RegistrationDTO(){
                                                         Vaccine = String.IsNullOrEmpty(_item.PartitionKey) ? 
-                                                                                    Vaccine.any
-                                                                                    : (Vaccine)Enum.Parse(typeof(Vaccine), _item.PartitionKey),
+                                                                                    "ANY"
+                                                                                    : _item.PartitionKey.ToUpper(),
                                                         EmailID = String.IsNullOrEmpty(_item.RowKey) ? 
                                                                                     null
                                                                                     : _item.RowKey,
+                                                        Payment = _item.Properties.ContainsKey("Payment") ? 
+                                                                                    _item.Properties["Payment"].StringValue
+                                                                                    :"ANY",
                                                         Name = _item.Properties.ContainsKey("Name") ?
                                                                                     _item.Properties["Name"].StringValue 
                                                                                     : null,
@@ -101,7 +104,7 @@ namespace CoWinAlert.Utils
                 return queriedResponse;
             }
             catch{
-                return new List<Registration>().AsEnumerable();
+                return new List<RegistrationDTO>().AsEnumerable();
             }
         }
 

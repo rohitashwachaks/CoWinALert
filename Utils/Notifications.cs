@@ -53,7 +53,7 @@ namespace CoWinAlert.Utils
         //     }
         //     return response;
         // }
-        public static async Task<string> RegisterEmailAsync(Registration user)
+        public static async Task<string> RegisterEmailAsync(RegistrationDTO user)
         {
             string htmlContent = $"Hi {user.Name}!\n"
             +$"Your details have been registered with us.\n"
@@ -70,11 +70,11 @@ namespace CoWinAlert.Utils
             string responseMessage = "Email Sent Succesfully";
             EmailAddress reciever = StructureEmailID(userName, userEmail);
             SendGridMessage msg = MailHelper.CreateSingleEmail(sender, reciever, EMAIL_SUBJECT, plainContent, htmlContent);
-            // Response response = await client.SendEmailAsync(msg);
+            Response response = await client.SendEmailAsync(msg);
             
-            // responseMessage = (response.IsSuccessStatusCode)?
-            //                                             responseMessage:
-            //                                             (await response.Body.ReadAsStringAsync());
+            responseMessage = (response.IsSuccessStatusCode)?
+                                                        responseMessage:
+                                                        (await response.Body.ReadAsStringAsync());
             return responseMessage;
         }
         #endregion Public Functions

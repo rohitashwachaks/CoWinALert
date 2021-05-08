@@ -16,6 +16,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CoWinAlert.DTO;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace CoWinAlert.Utils
@@ -49,17 +51,17 @@ namespace CoWinAlert.Utils
         }
         #endregion Structure URLS
         #region Async Calls
-        public static async IAsyncEnumerable<string> GetResultAsync(
-                                            List<DateTime> dateTimes,
+        public static async IAsyncEnumerable<SessionCalendarDTO> GetResultAsync(
+                                            IEnumerable<DateTime> dateTimes,
                                             List<long> pincodes,
                                             List<int> district_id
                                         )
         {
             IEnumerable<Task<HttpResponseMessage>> lstResponse = new List<Task<HttpResponseMessage>>();
-            foreach(DateTime date in dateTimes){
-                
-                IEnumerable<Task<HttpResponseMessage>> lstPin = from param in pincodes select FindByPin(param, date);
-                IEnumerable<Task<HttpResponseMessage>> lstDist = from param in district_id select FindByDistrict(param, date);
+            foreach(DateTime date in dateTimes)
+            {
+                IEnumerable<Task<HttpResponseMessage>> lstPin = from param in pincodes select CalendarByPin(param, date);
+                IEnumerable<Task<HttpResponseMessage>> lstDist = from param in district_id select CalendarByDistrict(param, date);
                 lstResponse = lstResponse.Concat(lstPin);
                 lstResponse = lstResponse.Concat(lstDist);
             }
@@ -70,11 +72,20 @@ namespace CoWinAlert.Utils
             {
                 if(responseMessage.IsSuccessStatusCode)
                 {
-                    yield return await responseMessage.Content.ReadAsStringAsync();
+                    string jsonString = await responseMessage.Content.ReadAsStringAsync();
+                    CentersDTO centerLst = JsonConvert.DeserializeObject<CentersDTO>(jsonString);
+                    foreach(SessionCalendarDTO center in centerLst.Centers)
+                    {
+                        yield return center;
+                    }
+                    // List<SessionCalendarDTO> centers = JsonConvert.DeserializeObject<List<SessionCalendarDTO>>(jsonString);
+
+                    // yield return centers;
                 }
             }
         }
         #endregion Async Calls
+        #region Helper Functions
         public static string ToDescriptionString(this PingAction val)
         {
             DescriptionAttribute[] attributes = (DescriptionAttribute[])val
@@ -83,6 +94,34 @@ namespace CoWinAlert.Utils
             .GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : string.Empty;
         }
+        #endregion Helper Functions
+        #region Filter Responses
+        public static List<SessionDTO> GetFilteredSessions(IEnumerable<SessionDTO> sessions, RegistrationDTO user)
+        {
+            List<SessionDTO> response = new List<SessionDTO>();
+            try
+            {
+                response = sessions.Where(_session =>
+                                    // Minimum Age less than User Age
+                                    (_session.Min_age_limit <= (DateTime.Now.Year - user.YearofBirth))
+                                    // Session Date AFTER Start Date
+                                    &&(DateTime.Compare(user.PeriodDate.StartDate,_session.SessionDate) >= 0)
+                                    // Session Date BEFORE END Date
+                                    &&(DateTime.Compare(_session.SessionDate,user.PeriodDate.EndDate) <= 0)
+                                    // Available Capacity > 0
+                                    &&(_session.Available_capacity > 0)
+                                    // Vaccine of Choice
+                                    &&(user.Vaccine ==_session.Vaccine
+                                        ||user.Vaccine == DTO.Vaccine.ANY.ToString())
+                                ).Select(_session => _session)
+                                .ToList();
+            }
+            catch{
+                ; 
+            }
+            return response;
+        }
+        #endregion Filter Responses
     }
     public enum PingAction{
         [Description("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict?")]

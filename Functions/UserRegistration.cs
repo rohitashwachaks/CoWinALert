@@ -22,21 +22,23 @@ namespace CoWinAlert.Function
         [FunctionName("user-registration")]
         [OpenApiOperation]
         [OpenApiParameter("vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(Vaccine))]
-        [OpenApiRequestBody("application/json", typeof(Registration))]
+        [OpenApiParameter("payment", In = ParameterLocation.Query, Required = true, Type = typeof(FeeTypeDTO))]
+        [OpenApiRequestBody("application/json", typeof(RegistrationDTO))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
         public static async Task<HttpResponseMessage> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "user/registration")] HttpRequest req,
             ILogger log)
         {
             string responseMessage = $"Hello ";
-            Vaccine vaccineName;
+            string vaccineName = "";
+            string payment = "";
 
             try{
-                string vaccine = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
-                vaccineName = (Vaccine)Enum.Parse(typeof(Vaccine), vaccine);
+                vaccineName = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
+                payment = HttpUtility.HtmlEncode(req.Query["payment"].ToString());
             }
             catch(Exception ex){
-                return HttpResponseHandler.StructureResponse(reason: "Invalid Vaccine Name",
+                return HttpResponseHandler.StructureResponse(reason: "Invalid Query Parameters",
                                                         content: ex.StackTrace,
                                                         code: HttpStatusCode.InternalServerError 
                                                     );
@@ -51,11 +53,12 @@ namespace CoWinAlert.Function
                                                     );
             }
             
-            Registration registrationData = new Registration();
+            RegistrationDTO registrationData = new RegistrationDTO();
             
             try{
-                registrationData = JsonConvert.DeserializeObject<Registration>(requestBody);
+                registrationData = JsonConvert.DeserializeObject<RegistrationDTO>(requestBody);
                 registrationData.Vaccine = vaccineName;
+                registrationData.Payment = payment;
 
                 log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));
                 responseMessage += $"{registrationData.Name}, ";
@@ -83,7 +86,7 @@ namespace CoWinAlert.Function
             
             
             responseMessage += registrationData.isValid()
-                            ? $"Your details have been registered. You will recieve notifications on {registrationData.EmailID}\n,"
+                            ? $"Your details have been registered. You will recieve notifications on {registrationData.EmailID},"
                                 +" Remember to check the SPAM FOLDER for mails from captain.nemo.github@gmail.com"
                             : "Invalid Data";
 

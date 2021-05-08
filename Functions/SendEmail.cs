@@ -19,8 +19,9 @@ namespace CoWinAlert.Function
     public static class SendEmail
     {
         [FunctionName("send-Notification")]
+        [Disable]
         [OpenApiOperation]
-        // [OpenApiParameter("name", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiIgnore]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
         public static async Task<HttpResponseMessage> RunAsync(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "backend/send-notif")] HttpRequest req,
