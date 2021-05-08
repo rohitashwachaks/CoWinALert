@@ -87,10 +87,9 @@ namespace CoWinAlert.DTO
         public string PinCode{
             set{
                 try{
-                    _pincodes = value.Split(",")
-                                        .Where(_code => Regex.IsMatch(_code.ToString(), @"^[0-9]{6}$"))
-                                        .Select(_code => long.Parse(_code))
-                                        .ToList();
+                    _pincodes = JsonConvert.DeserializeObject<List<long>>(value)
+                                            .Where(_code => Regex.IsMatch(_code.ToString(), @"^[0-9]{6}$"))
+                                            .ToList();
                     if(_pincodes.Count == 0){
                         _isValid = false;
                     }
@@ -109,12 +108,11 @@ namespace CoWinAlert.DTO
         public string DistrictCode{
             set{
                 try{
-                    _districtcodes = value.Split(",")
-                                        .Where(_code => 
-                                            Regex.IsMatch(_code.ToString(), @"^[0-9]+$")
-                                        )
-                                        .Select(_code => int.Parse(_code))
-                                        .ToList();
+                    _districtcodes = JsonConvert.DeserializeObject<List<int>>(value)
+                                                .Where(_code => 
+                                                    Regex.IsMatch(_code.ToString(), @"^[0-9]+$")
+                                                )
+                                                .ToList();
                     if(_pincodes.Count == 0){
                         _isValid = false;
                     }

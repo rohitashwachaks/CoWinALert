@@ -8,6 +8,7 @@ namespace CoWinAlert
         public override void Configure(IFunctionsHostBuilder builder){
             TableInfo.InitialiseConfig();
             PingCoWin.Initialise();
+            Notifications.Initialise();
         }
     }
 }

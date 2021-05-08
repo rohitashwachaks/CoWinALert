@@ -25,7 +25,7 @@ namespace CoWinAlert.Function
         [OpenApiRequestBody("application/json", typeof(Registration))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(string))]
         public static async Task<HttpResponseMessage> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "user/registration")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "user/registration")] HttpRequest req,
             ILogger log)
         {
             string responseMessage = $"Hello ";
@@ -67,6 +67,10 @@ namespace CoWinAlert.Function
                     // Add to Table
                     string x = TableInfo.AddRowtoTable(registrationData);
                     log.LogInformation(x);
+
+                    // Send Email
+                    x = await Notifications.RegisterEmailAsync(registrationData);
+                    log.LogInformation(x);
                 }
             }
             catch(Exception ex){
@@ -79,7 +83,8 @@ namespace CoWinAlert.Function
             
             
             responseMessage += registrationData.isValid()
-                            ? $"Your details have been registered. You will recieve notifications on {registrationData.EmailID}"
+                            ? $"Your details have been registered. You will recieve notifications on {registrationData.EmailID}\n,"
+                                +" Remember to check the SPAM FOLDER for mails from captain.nemo.github@gmail.com"
                             : "Invalid Data";
 
             return HttpResponseHandler.StructureResponse(content: responseMessage,
