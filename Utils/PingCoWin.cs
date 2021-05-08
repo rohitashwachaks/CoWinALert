@@ -96,23 +96,30 @@ namespace CoWinAlert.Utils
         }
         #endregion Helper Functions
         #region Filter Responses
-        public static ResponseDTO GetFilteredResult(CentersDTO centers, RegistrationDTO user)
+        public static List<SessionDTO> GetFilteredSessions(IEnumerable<SessionDTO> sessions, RegistrationDTO user)
         {
+            List<SessionDTO> response = new List<SessionDTO>();
             try
             {
-                ResponseDTO filteredResponse = new ResponseDTO();
-
-                // if()
-                foreach(SessionCalendarDTO calendar in centers.Centers)
-                {
-                    ;
-                }
-
-                return filteredResponse;
+                response = sessions.Where(_session =>
+                                    // Minimum Age less than User Age
+                                    (_session.Min_age_limit <= (DateTime.Now.Year - user.YearofBirth))
+                                    // Session Date AFTER Start Date
+                                    &&(DateTime.Compare(user.PeriodDate.StartDate,_session.SessionDate) >= 0)
+                                    // Session Date BEFORE END Date
+                                    &&(DateTime.Compare(_session.SessionDate,user.PeriodDate.EndDate) <= 0)
+                                    // Available Capacity > 0
+                                    &&(_session.Available_capacity > 0)
+                                    // Vaccine of Choice
+                                    &&(user.Vaccine ==_session.Vaccine
+                                        ||user.Vaccine == DTO.Vaccine.ANY.ToString())
+                                ).Select(_session => _session)
+                                .ToList();
             }
-            catch(Exception ex){
-                return new ResponseDTO();;
+            catch{
+                ; 
             }
+            return response;
         }
         #endregion Filter Responses
     }

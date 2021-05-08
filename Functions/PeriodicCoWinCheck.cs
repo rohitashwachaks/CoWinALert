@@ -20,15 +20,14 @@ namespace CoWinAlert.Function
     public static class PeriodicCoWinCheck
     {
         /// Function to periodically ceheck CoWin
-        [FunctionName("cowin-check")]
+        // [FunctionName("cowin-check")]
+        // [OpenApiOperation]
+        // public static async Task<HttpResponseMessage> RunAsync(
+        //     [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "cowin/check")] HttpRequest req,
+        //     ILogger log)
+        [FunctionName("PeriodicCoWinCheck")]
         // [Disable]
-        [OpenApiOperation]
-        public static async Task<HttpResponseMessage> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "cowin/check")] HttpRequest req,
-            ILogger log)
-        // [FunctionName("PeriodicCoWinCheck")]
-        // // [Disable]
-        // public static async void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, ILogger log)
+        public static async void Run([TimerTrigger("0 */15 * * * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToShortDateString()}");
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
@@ -53,34 +52,29 @@ namespace CoWinAlert.Function
                     if(user.Payment == center.Fee_type.ToString()
                         ||user.Payment == FeeTypeDTO.ANY.ToString())
                     {
-                        // List<SessionDTO> filteredSessions
-                        center.Sessions = center.Sessions.Where(_session =>
-                                                    // Minimum Age less than User Age
-                                                    (_session.Min_age_limit <= (DateTime.Now.Year - user.YearofBirth))
-                                                    // Session Date AFTER Start Date
-                                                    &&(DateTime.Compare(user.PeriodDate.StartDate,_session.SessionDate) >= 0)
-                                                    // Session Date BEFORE END Date
-                                                    &&(DateTime.Compare(_session.SessionDate,user.PeriodDate.EndDate) <= 0)
-                                                    // Available Capacity > 0
-                                                    &&(_session.Available_capacity > 0)
-                                                    // Vaccine of Choice
-                                                    &&(user.Vaccine ==_session.Vaccine
-                                                        ||user.Vaccine == DTO.Vaccine.ANY.ToString())
-                                                ).Select(_session => _session)
-                                                .ToList();
+                        center.Sessions = PingCoWin.GetFilteredSessions(center.Sessions, user);
+
                         if(center.Sessions.Count > 0 )
                         {
                             result = result.Append(center);
-                        }                        
+                        }
                     }
-                    // ResponseDTO response = PingCoWin.GetFilteredResult(centers, user);                    
                 }
-                
+
+                if(result.ToList().Count > 0)
+                {
+                    string response = await Notifications.SendEmail(
+                                                    userEmail: user.EmailID,
+                                                    userName: user.Name,
+                                                    htmlContent: JsonConvert.SerializeObject(result)
+                                                );
+                }
+
                 log.LogInformation(JsonConvert.SerializeObject(result, Formatting.Indented));
-            }
-            return HttpResponseHandler.StructureResponse(content: result,
-                                                        code: HttpStatusCode.OK 
-                                                    );
+            }            
+            // return HttpResponseHandler.StructureResponse(content: result,
+            //                                             code: HttpStatusCode.OK 
+            //                                         );
         }
 
         private static IEnumerable<DateTime> GetDateList(DateTime startDate, DateTime endDate)

@@ -70,11 +70,11 @@ namespace CoWinAlert.Utils
             string responseMessage = "Email Sent Succesfully";
             EmailAddress reciever = StructureEmailID(userName, userEmail);
             SendGridMessage msg = MailHelper.CreateSingleEmail(sender, reciever, EMAIL_SUBJECT, plainContent, htmlContent);
-            // Response response = await client.SendEmailAsync(msg);
+            Response response = await client.SendEmailAsync(msg);
             
-            // responseMessage = (response.IsSuccessStatusCode)?
-            //                                             responseMessage:
-            //                                             (await response.Body.ReadAsStringAsync());
+            responseMessage = (response.IsSuccessStatusCode)?
+                                                        responseMessage:
+                                                        (await response.Body.ReadAsStringAsync());
             return responseMessage;
         }
         #endregion Public Functions
