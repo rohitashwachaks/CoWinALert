@@ -55,12 +55,12 @@ namespace CoWinAlert.Function
                 }
                 log.LogDebug(JsonConvert.SerializeObject(calendarDates));
                 
-                // await foreach(string message in PingCoWin.GetResultAsync(
-                //                                             new List<DateTime>(){DateTime.Now}, 
-                //                                             user.Codes,
-                //                                             user.District)){
-                //     response = response.Append(JsonConvert.DeserializeObject<JObject>(message));
-                // }
+                await foreach(string message in PingCoWin.GetResultAsync(
+                                                            new List<DateTime>(){DateTime.Now}, 
+                                                            user.Codes,
+                                                            user.District)){
+                    response = response.Append(JsonConvert.DeserializeObject<JObject>(message));
+                }
                 
                 log.LogInformation(JsonConvert.SerializeObject(response, Formatting.Indented));
             }
