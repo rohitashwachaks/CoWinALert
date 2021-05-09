@@ -26,8 +26,8 @@ namespace CoWinAlert.Function
         [OpenApiParameter("email", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiParameter("phone", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiParameter("birth-year", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
-        [OpenApiParameter("start-date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
-        [OpenApiParameter("end-date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("search-start-date-yyyy-mm-dd", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("search-end-date-yyyy-mm-dd", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiParameter("pincode", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiParameter("vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(Vaccine))]
         [OpenApiParameter("payment", In = ParameterLocation.Query, Required = true, Type = typeof(FeeTypeDTO))]
@@ -47,8 +47,8 @@ namespace CoWinAlert.Function
                 inputResult.Phone = HttpUtility.HtmlEncode(req.Query["phone"]);
                 inputResult.YearofBirth = Int16.Parse(HttpUtility.HtmlEncode(req.Query["birth-year"]));
                 inputResult.PeriodDate = new DateRangeDTO(){
-                                                        StartDate = DateTime.Parse(HttpUtility.HtmlEncode(req.Query["start-date"])),
-                                                        EndDate = DateTime.Parse(HttpUtility.HtmlEncode(req.Query["end-date"]))
+                                                        StartDate = DateTime.Parse(HttpUtility.HtmlEncode(req.Query["search-start-date-yyyy-mm-dd"])),
+                                                        EndDate = DateTime.Parse(HttpUtility.HtmlEncode(req.Query["search-end-date-yyyy-mm-dd"]))
                                                     };
                 inputResult.PinCode = JsonConvert.SerializeObject(HttpUtility.HtmlEncode(req.Query["pincode"]).Split(","));
                 inputResult.Vaccine = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
