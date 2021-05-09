@@ -1,98 +1,108 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Web;
 using CoWinAlert.DTO;
+using CoWinAlert.Utils;
+using System.Net;
+using System.Net.Http;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Core.Attributes;
 using Microsoft.OpenApi.Models;
-using System.Net;
-using CoWinAlert.Utils;
-using System.Web;
-using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace CoWinAlert.Function
 {
-    public static class UserRegistration
+    public static class StructureInput
     {
-        ///Function to Register Users and their Preferences
         [FunctionName("user-registration")]
         [OpenApiOperation]
+        [OpenApiParameter("name", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("email", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("phone", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("birth-year", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
+        [OpenApiParameter("start-date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("end-date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("pincode", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiParameter("vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(Vaccine))]
         [OpenApiParameter("payment", In = ParameterLocation.Query, Required = true, Type = typeof(FeeTypeDTO))]
-        [OpenApiRequestBody("application/json", typeof(RegistrationDTO))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(InputDTO))]
+        [OpenApiResponseWithBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
+        [OpenApiResponseWithBody(HttpStatusCode.InternalServerError, "application/json", typeof(JObject))]
         public static async Task<HttpResponseMessage> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "step-2/user-registration")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "user/registration")] HttpRequest req,
             ILogger log)
         {
-            string responseMessage = $"Hello ";
-            string vaccineName = "";
-            string payment = "";
+            InputDTO inputResult = new InputDTO();
+            try
+            {
+                #region Structute Inputs
+                inputResult.Name = HttpUtility.HtmlEncode(req.Query["name"]);
+                inputResult.EmailID = HttpUtility.HtmlEncode(req.Query["email"]);
+                inputResult.Phone = HttpUtility.HtmlEncode(req.Query["phone"]);
+                inputResult.YearofBirth = Int16.Parse(HttpUtility.HtmlEncode(req.Query["birth-year"]));
+                inputResult.PeriodDate = new DateRangeDTO(){
+                                                        StartDate = DateTime.Parse(HttpUtility.HtmlEncode(req.Query["start-date"])),
+                                                        EndDate = DateTime.Parse(HttpUtility.HtmlEncode(req.Query["end-date"]))
+                                                    };
+                inputResult.PinCode = JsonConvert.SerializeObject(HttpUtility.HtmlEncode(req.Query["pincode"]).Split(","));
+                inputResult.Vaccine = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
+                inputResult.Payment = HttpUtility.HtmlEncode(req.Query["payment"].ToString());
+                #endregion Structute Inputs
+                
+                if(inputResult.isValid())
+                {
+                    RegistrationDTO registrationData = new RegistrationDTO(){
+                                                                Name = inputResult.Name,
+                                                                EmailID = inputResult.EmailID,
+                                                                Phone = inputResult.Phone,
+                                                                YearofBirth = inputResult.YearofBirth,
+                                                                PeriodDate = inputResult.PeriodDate,
+                                                                PinCode = inputResult.PinCode,
+                                                                Vaccine = inputResult.Vaccine,
+                                                                Payment = inputResult.Payment
+                                                            };
+                                                            
+                    string body = "User Already Signed up";
+                    // Check if it exists in table
+                    if(TableInfo.isUserExisting(registrationData) &&
+                        registrationData.isValid()
+                    )
+                    {
+                        // Add to Table
+                        body = TableInfo.AddRowtoTable(registrationData);
+                        log.LogInformation(body);
 
-            try{
-                vaccineName = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
-                payment = HttpUtility.HtmlEncode(req.Query["payment"].ToString());
-            }
-            catch(Exception ex){
-                return HttpResponseHandler.StructureResponse(reason: "Invalid Query Parameters",
-                                                        content: ex.StackTrace,
-                                                        code: HttpStatusCode.InternalServerError 
-                                                    );
-            }
-            
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            
-            if(requestBody == null){
-                log.LogError("No Data in request Body");
-                return HttpResponseHandler.StructureResponse(content: "No data",
-                                                        code: HttpStatusCode.BadRequest 
-                                                    );
-            }
-            
-            RegistrationDTO registrationData = new RegistrationDTO();
-            
-            try{
-                registrationData = JsonConvert.DeserializeObject<RegistrationDTO>(requestBody);
-                registrationData.Vaccine = vaccineName;
-                registrationData.Payment = payment;
-
-                log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));
-                responseMessage += $"{registrationData.Name}, ";
-
-                // Check if it exists in table
-                if(TableInfo.isUserExisting(registrationData) &&
-                    registrationData.isValid()
-                ){
-                    // Add to Table
-                    string x = TableInfo.AddRowtoTable(registrationData);
-                    log.LogInformation(x);
-
-                    // Send Email
-                    x = await Notifications.RegisterEmailAsync(registrationData);
-                    log.LogInformation(x);
+                        // Send Email
+                        body = await Notifications.RegisterEmailAsync(registrationData);
+                        log.LogInformation(body);
+                    }
+                    return HttpResponseHandler.StructureResponse(reason: body,
+                                                            content: inputResult,
+                                                            code: HttpStatusCode.OK 
+                                                        );
                 }
+                else
+                {
+                    return HttpResponseHandler.StructureResponse(reason: inputResult.InvalidReason(),
+                                                            content: inputResult,
+                                                            code: HttpStatusCode.BadRequest 
+                                                        );
+                }
+                
             }
-            catch(Exception ex){
-                log.LogError(ex.Message);
-                return HttpResponseHandler.StructureResponse(reason: ex.Message,
+            catch(Exception ex)
+            {
+                return HttpResponseHandler.StructureResponse(reason: $"Invalid Query Parameters+{ex.Message}",
                                                         content: ex.StackTrace,
                                                         code: HttpStatusCode.InternalServerError 
                                                     );
-            }            
-            
-            
-            responseMessage += registrationData.isValid()
-                            ? $"Your details have been registered. You will recieve notifications on {registrationData.EmailID},"
-                                +" Remember to check the SPAM FOLDER for mails from captain.nemo.github@gmail.com"
-                            : "Invalid Data";
-
-            return HttpResponseHandler.StructureResponse(content: responseMessage,
-                                                        code: HttpStatusCode.OK 
-                                                    );
+            }
         }
     }
 }

@@ -70,11 +70,12 @@ namespace CoWinAlert.DTO
             }
             set{
                 try{
-                    if(Regex.IsMatch(value.ToString(),@"^19[0-9]{2}")){
+                    if(Regex.IsMatch(value.ToString(),@"^19[0-9]{2}$")){
                         _yearofBirth = value;
                     }
                     else{
                         _isValid = false;
+                        _reasonPhrase += $"\nError in Year of Birth Parsing.";
                     }
                 }
                 catch{
@@ -142,6 +143,7 @@ namespace CoWinAlert.DTO
                     }
                     if(String.IsNullOrEmpty(_phone)){
                         _isValid = false;
+                        _reasonPhrase += $"\nInvalid Phone Number";
                     }
                 }
                 catch{

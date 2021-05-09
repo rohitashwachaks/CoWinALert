@@ -17,6 +17,8 @@ namespace CoWinAlert.DTO
         private string _name = "";
         private string _email = "";
         private string _phone = "";
+        private Vaccine _vaccine = DTO.Vaccine.ANY;
+        private FeeTypeDTO _payment = DTO.FeeTypeDTO.ANY;
         
         #endregion Private Members
         #region Public Members
@@ -31,12 +33,12 @@ namespace CoWinAlert.DTO
                     }
                     else{
                         _isValid = false;
-                        _reasonPhrase += $"\nEmpty Name";
+                        _reasonPhrase += $".. Empty Name";
                     }
                 }
                 catch{
                     _isValid = false;
-                    _reasonPhrase += $"\nError in Name Parsing. Input value = {value}";
+                    _reasonPhrase += $".. Error in Name Parsing. Input value = {value}";
                 }
             }
         }
@@ -51,12 +53,12 @@ namespace CoWinAlert.DTO
                     }
                     else{
                         _isValid = false;
-                        _reasonPhrase += $"\nInValid Email";
+                        _reasonPhrase += $".. InValid Email";
                     }
                 }
                 catch{
                     _isValid = false;
-                    _reasonPhrase += $"\nError in EmailID Parsing. Input value = {value}";
+                    _reasonPhrase += $".. Error in EmailID Parsing. Input value = {value}";
                 }
             }
         }
@@ -66,17 +68,17 @@ namespace CoWinAlert.DTO
             }
             set{
                 try{
-                    if(Regex.IsMatch(value.ToString(),@"^19[0-9]{2}")){
+                    if(Regex.IsMatch(value.ToString(),@"^19[0-9]{2}$")){
                         _yearofBirth = value;
                     }
                     else{
                         _isValid = false;
-                        _reasonPhrase += $"\nError in Year of Birth Parsing. Input value = Empty";
+                        _reasonPhrase += $".. Invalid Year of Birth.";
                     }
                 }
                 catch{
                     _isValid = false;
-                    _reasonPhrase += $"\nError in Year of Birth Parsing. Input value = {value.ToString()}";
+                    _reasonPhrase += $".. Error in Year of Birth Parsing. Input value = {value.ToString()}";
                 }        
             }
         }
@@ -93,12 +95,12 @@ namespace CoWinAlert.DTO
                                     .ToList();
                     if(_pincodes.Count == 0){
                         _isValid = false;
-                        _reasonPhrase += $"\nError in Pin Code Parsing. Input value Empty";
+                        _reasonPhrase += $".. Invalid Pin Code.";
                     }
                 }
                 catch{
                     _isValid = false;
-                    _reasonPhrase += $"\nError in Pin Code Parsing. Input value = {value}";
+                    _reasonPhrase += $".. Error in Pin Code Parsing. Input value = {value}";
                 }
             }
         }
@@ -117,12 +119,12 @@ namespace CoWinAlert.DTO
                                         .ToList();
                     if(_pincodes.Count == 0){
                         _isValid = false;
-                        _reasonPhrase += $"\nError in District Code Parsing. Input value Empty";
+                        _reasonPhrase += $".. Invalid District Code.Please give comma-separated values";
                     }
                 }
                 catch{
                     _isValid = false;
-                    _reasonPhrase += $"\nError in District code Parsing. Input value = {value}";
+                    _reasonPhrase += $".. Error in District code Parsing. Input value = {value}";
                 }
             }
         }
@@ -137,15 +139,53 @@ namespace CoWinAlert.DTO
                     }
                     if(String.IsNullOrEmpty(_phone)){
                         _isValid = false;
-                        _reasonPhrase += $"\nError in Phone Number Parsing. Input value Empty";
+                        _reasonPhrase += $".. Invalid Phone Number. 10 digits please";
                     }
                 }
                 catch{
                     _isValid = false;
-                    _reasonPhrase += $"\nError in Phone Number Parsing. Input value = {value}";
+                    _reasonPhrase += $".. Error in Phone Number Parsing. Input value = {value}";
                 }        
             }
         }
+        public string Vaccine
+        { get
+            {
+                return _vaccine.ToString();
+            } 
+            set
+            {
+                try
+                {
+                    _vaccine = (Vaccine)Enum.Parse(typeof(Vaccine), value.ToUpper());
+                }
+                catch
+                {
+                    _isValid = false;
+                    _reasonPhrase += $".. Error in Vaccine Parsing. Input value = {value}";
+                }
+            }
+        }
+        public string Payment
+        {
+            get
+            {
+                return _payment.ToString();
+            }
+            set
+            {
+                try
+                {
+                    _payment = (FeeTypeDTO)Enum.Parse(typeof(FeeTypeDTO), value.ToUpper());
+                }
+                catch
+                {
+                    _isValid = false;
+                    _reasonPhrase += $".. Error in Payment Parsing. Input value = {value}";
+                }
+            }
+        }
+
         #endregion Public Members
 
         #region Public Functions        
