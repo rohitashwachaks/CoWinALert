@@ -17,7 +17,7 @@ namespace CoWinAlert.Utils
             var client = account.CreateCloudTableClient();
             var x = account.TableEndpoint;
             
-            registrationTable = client.GetTableReference("UserRegistration");
+            registrationTable = client.GetTableReference(Environment.GetEnvironmentVariable("TABLE_NAME"));
         }
         public static bool isUserExisting(RegistrationDTO user)
         {

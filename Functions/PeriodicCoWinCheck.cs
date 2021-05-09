@@ -40,7 +40,7 @@ namespace CoWinAlert.Function
 
                 calendarDates = GetDateList(user.PeriodDate.StartDate, user.PeriodDate.EndDate);
                 
-                log.LogDebug(JsonConvert.SerializeObject(calendarDates));
+                log.LogInformation(JsonConvert.SerializeObject(calendarDates));
                 
                 await foreach(SessionCalendarDTO center in PingCoWin.GetResultAsync(
                                                             calendarDates, 
@@ -63,18 +63,18 @@ namespace CoWinAlert.Function
 
                 if(result.ToList().Count > 0)
                 {
+                    string htmlBody = Notifications.StructureSessionEmailBody(result);
+                    // log.LogInformation(htmlBody);
                     string response = await Notifications.SendEmail(
                                                     userEmail: user.EmailID,
                                                     userName: user.Name,
-                                                    htmlContent: JsonConvert.SerializeObject(result)
+                                                    htmlContent: htmlBody
                                                 );
+                    log.LogInformation(response);
                 }
 
                 log.LogInformation(JsonConvert.SerializeObject(result, Formatting.Indented));
-            }            
-            // return HttpResponseHandler.StructureResponse(content: result,
-            //                                             code: HttpStatusCode.OK 
-            //                                         );
+            }
         }
 
         private static IEnumerable<DateTime> GetDateList(DateTime startDate, DateTime endDate)
