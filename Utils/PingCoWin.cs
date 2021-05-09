@@ -104,15 +104,17 @@ namespace CoWinAlert.Utils
                 response = sessions.Where(_session =>
                                     // Minimum Age less than User Age
                                     (_session.Min_age_limit <= (DateTime.Now.Year - user.YearofBirth))
-                                    // Session Date AFTER Start Date
-                                    &&(DateTime.Compare(user.PeriodDate.StartDate,_session.SessionDate) >= 0)
-                                    // Session Date BEFORE END Date
+                                    // Start Date EARLIER OR SAME as Session Date
+                                    &&(DateTime.Compare(user.PeriodDate.StartDate,_session.SessionDate) <= 0)
+                                    // Session Date EARLIER OR SAME as End Date
                                     &&(DateTime.Compare(_session.SessionDate,user.PeriodDate.EndDate) <= 0)
                                     // Available Capacity > 0
                                     &&(_session.Available_capacity > 0)
                                     // Vaccine of Choice
                                     &&(user.Vaccine ==_session.Vaccine
-                                        ||user.Vaccine == DTO.Vaccine.ANY.ToString())
+                                        ||user.Vaccine == DTO.Vaccine.ANY.ToString()
+                                        ||_session.Vaccine == DTO.Vaccine.ANY.ToString()
+                                    )
                                 ).Select(_session => _session)
                                 .ToList();
             }

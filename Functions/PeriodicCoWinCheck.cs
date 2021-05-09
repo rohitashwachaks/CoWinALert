@@ -27,7 +27,7 @@ namespace CoWinAlert.Function
         //     ILogger log)
         [FunctionName("PeriodicCoWinCheck")]
         // [Disable]
-        public static async void Run([TimerTrigger("0 */30 * * * *")]TimerInfo myTimer, ILogger log)
+        public static async void Run([TimerTrigger("0 * * * * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToShortDateString()}");
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
@@ -40,7 +40,7 @@ namespace CoWinAlert.Function
 
                 calendarDates = GetDateList(user.PeriodDate.StartDate, user.PeriodDate.EndDate);
                 
-                log.LogDebug(JsonConvert.SerializeObject(calendarDates));
+                log.LogInformation(JsonConvert.SerializeObject(calendarDates));
                 
                 await foreach(SessionCalendarDTO center in PingCoWin.GetResultAsync(
                                                             calendarDates, 
@@ -66,15 +66,15 @@ namespace CoWinAlert.Function
                     string response = await Notifications.SendEmail(
                                                     userEmail: user.EmailID,
                                                     userName: user.Name,
-                                                    htmlContent: JsonConvert.SerializeObject(result)
+                                                    htmlContent: JsonConvert.SerializeObject(result,
+                                                                                            Formatting.Indented
+                                                                                            )
                                                 );
+                    log.LogInformation(response);
                 }
 
                 log.LogInformation(JsonConvert.SerializeObject(result, Formatting.Indented));
-            }            
-            // return HttpResponseHandler.StructureResponse(content: result,
-            //                                             code: HttpStatusCode.OK 
-            //                                         );
+            }
         }
 
         private static IEnumerable<DateTime> GetDateList(DateTime startDate, DateTime endDate)
