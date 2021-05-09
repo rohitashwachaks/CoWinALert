@@ -32,22 +32,22 @@ namespace CoWinAlert.Utils
         #region Structure URLS
         public static async Task<HttpResponseMessage> FindByDistrict(int district_id, DateTime date)
         {
-            string url = PingAction.FindByDistrict.ToDescriptionString()+$"district_id={district_id.ToString()}&date={date.ToShortDateString()}";
+            string url = PingAction.FindByDistrict.ToDescriptionString()+$"district_id={district_id.ToString()}&date={date.ToString("dd\\-MM\\-yyyy")}";
             return await client.GetAsync(url);
         }
         public static async Task<HttpResponseMessage> FindByPin(long pincode, DateTime date)
         {
-            string url = PingAction.FindByPin.ToDescriptionString()+$"pincode={pincode.ToString()}&date={date.ToShortDateString()}";
+            string url = PingAction.FindByPin.ToDescriptionString()+$"pincode={pincode.ToString()}&date={date.ToString("dd\\-MM\\-yyyy")}";
             return await client.GetAsync(url);
         }
         public static Task<HttpResponseMessage> CalendarByDistrict(int district_id, DateTime date)
         {
-            string url = PingAction.CalendarByDistrict.ToDescriptionString()+$"district_id={district_id.ToString()}&date={date.ToShortDateString()}";
+            string url = PingAction.CalendarByDistrict.ToDescriptionString()+$"district_id={district_id.ToString()}&date={date.ToString("dd\\-MM\\-yyyy")}";
             return client.GetAsync(url);
         }
         public static Task<HttpResponseMessage> CalendarByPin(long pincode, DateTime date, ILogger logger)
         {
-            string url = PingAction.CalendarByPin.ToDescriptionString()+$"pincode={pincode.ToString()}&date={date.ToShortDateString()}";
+            string url = PingAction.CalendarByPin.ToDescriptionString()+$"pincode={pincode.ToString()}&date={date.ToString("dd\\-MM\\-yyyy")}";
             logger.LogCritical(url);
             return client.GetAsync(url);
         }
