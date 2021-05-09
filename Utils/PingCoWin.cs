@@ -17,6 +17,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CoWinAlert.DTO;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -44,9 +45,10 @@ namespace CoWinAlert.Utils
             string url = PingAction.CalendarByDistrict.ToDescriptionString()+$"district_id={district_id.ToString()}&date={date.ToShortDateString()}";
             return client.GetAsync(url);
         }
-        public static Task<HttpResponseMessage> CalendarByPin(long pincode, DateTime date)
+        public static Task<HttpResponseMessage> CalendarByPin(long pincode, DateTime date, ILogger logger)
         {
             string url = PingAction.CalendarByPin.ToDescriptionString()+$"pincode={pincode.ToString()}&date={date.ToShortDateString()}";
+            logger.LogCritical(url);
             return client.GetAsync(url);
         }
         #endregion Structure URLS
@@ -54,13 +56,14 @@ namespace CoWinAlert.Utils
         public static async IAsyncEnumerable<SessionCalendarDTO> GetResultAsync(
                                             IEnumerable<DateTime> dateTimes,
                                             List<long> pincodes,
-                                            List<int> district_id
+                                            List<int> district_id,
+                                            ILogger log
                                         )
         {
             IEnumerable<Task<HttpResponseMessage>> lstResponse = new List<Task<HttpResponseMessage>>();
             foreach(DateTime date in dateTimes)
             {
-                IEnumerable<Task<HttpResponseMessage>> lstPin = from param in pincodes select CalendarByPin(param, date);
+                IEnumerable<Task<HttpResponseMessage>> lstPin = from param in pincodes select CalendarByPin(param, date, logger: log);
                 IEnumerable<Task<HttpResponseMessage>> lstDist = from param in district_id select CalendarByDistrict(param, date);
                 lstResponse = lstResponse.Concat(lstPin);
                 lstResponse = lstResponse.Concat(lstDist);

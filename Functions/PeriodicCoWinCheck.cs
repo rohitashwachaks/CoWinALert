@@ -45,7 +45,8 @@ namespace CoWinAlert.Function
                 await foreach(SessionCalendarDTO center in PingCoWin.GetResultAsync(
                                                             calendarDates, 
                                                             user.Codes,
-                                                            user.District))
+                                                            user.District,
+                                                            log))
                 {
                     // ResponseDTO filteredResponse = new ResponseDTO();
                     // Process center iff Payment type matches
