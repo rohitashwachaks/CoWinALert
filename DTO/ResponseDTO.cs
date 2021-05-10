@@ -71,10 +71,6 @@ namespace CoWinAlert.DTO
     {
         public List<SessionCalendarDTO> Centers{get; set;}
     }
-    public class ResponseDTO
-    {
-        public List<string> Slots{get;set;}
-    }
     }
 /**
 {

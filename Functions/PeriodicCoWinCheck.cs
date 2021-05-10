@@ -20,12 +20,14 @@ namespace CoWinAlert.Function
         //     ILogger log)
         [FunctionName("PeriodicCoWinCheck")]
         // [Disable]
-        public static async void Run([TimerTrigger("0 */30 * * * *")]TimerInfo myTimer, ILogger log)
+        public static async void Run([TimerTrigger("0 2-59/5 * * * *")]TimerInfo myTimer, ILogger log)
         {
-            log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToShortDateString()}");
+            log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToString("dd\\-MM\\-yyyy HH:MM:ss")}");
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
-            
-            foreach(RegistrationDTO user in TableInfo.FetchUsers())
+
+            int batchCount = DateTime.Now.Minute / 5;
+
+            foreach(RegistrationDTO user in TableInfo.FetchUsers(batchCount.ToString()))
             {
                 log.LogInformation(JsonConvert.SerializeObject(user, Formatting.Indented));
                 
@@ -33,7 +35,7 @@ namespace CoWinAlert.Function
 
                 calendarDates = GetDateList(user.PeriodDate.StartDate, user.PeriodDate.EndDate, log);
                 
-                log.LogInformation(JsonConvert.SerializeObject(calendarDates, Formatting.Indented));
+                log.LogInformation("Calendar Dates: \n"+JsonConvert.SerializeObject(calendarDates, Formatting.Indented));
                 
                 await foreach(SessionCalendarDTO center in PingCoWin.GetResultAsync(
                                                             calendarDates, 
@@ -57,16 +59,15 @@ namespace CoWinAlert.Function
                 if(result.ToList().Count > 0)
                 {
                     string htmlBody = Notifications.StructureSessionEmailBody(result);
-                    // log.LogInformation(htmlBody);
+                    log.LogInformation(htmlBody);
                     string response = await Notifications.SendEmail(
                                                     userEmail: user.EmailID,
                                                     userName: user.Name,
-                                                    htmlContent: htmlBody
-                                                );
+                                                    htmlContent: htmlBody);
                     log.LogInformation(response);
                 }
 
-                log.LogInformation(JsonConvert.SerializeObject(result, Formatting.Indented));
+                log.LogInformation("Result"+JsonConvert.SerializeObject(result, Formatting.Indented));
             }
         }
 

@@ -76,14 +76,12 @@ namespace CoWinAlert.Function
                     {
                         // Add to Table
                         body = TableInfo.AddRowtoTable(registrationData);
-                        log.LogInformation(body);
-
+                        
                         // Send Email
-                        body = await Notifications.RegisterEmailAsync(registrationData);
+                        body += await Notifications.RegisterEmailAsync(registrationData);
                         log.LogInformation(body);
                     }
-                    return HttpResponseHandler.StructureResponse(reason: body,
-                                                            content: inputResult,
+                    return HttpResponseHandler.StructureResponse(content: body,
                                                             code: HttpStatusCode.OK 
                                                         );
                 }
