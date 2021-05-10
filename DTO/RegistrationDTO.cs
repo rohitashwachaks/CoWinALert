@@ -28,11 +28,7 @@ namespace CoWinAlert.DTO
         public RegistrationDTO()
         {
             Random randomGenereator = new Random();
-
-            
-            int batchCount = int.Parse(Environment.GetEnvironmentVariable("BATCH_COUNT"));
-            // No 0 batch. Batch 0 for me exclusively.
-            batchCount = randomGenereator.Next(1000)%batchCount+1;
+            int batchCount = randomGenereator.Next(10000)%12;
             
             Batch = String.IsNullOrEmpty(Batch)?  batchCount.ToString(): Batch;
         }

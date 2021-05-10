@@ -20,14 +20,12 @@ namespace CoWinAlert.Function
         //     ILogger log)
         [FunctionName("PeriodicCoWinCheck")]
         // [Disable]
-        public static async void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
+        public static async void Run([TimerTrigger("0 (*-1)/5 * * * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToString("dd\\-MM\\-yyyy")}");
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
 
-            // Batch-0 for me exclusively.
-            int batchCount = int.Parse(Environment.GetEnvironmentVariable("BATCH_COUNT"))+1; 
-            batchCount = DateTime.Now.Minute / batchCount;
+            int batchCount = DateTime.Now.Minute / 5;
 
             foreach(RegistrationDTO user in TableInfo.FetchUsers(batchCount.ToString()))
             {

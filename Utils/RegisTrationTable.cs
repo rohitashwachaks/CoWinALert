@@ -11,16 +11,13 @@ namespace CoWinAlert.Utils
     {
         private static CloudTable registrationTable;
         private static Random randomGenereator;
-        private static int batchCount;
         public static void InitialiseConfig()
         {
             CloudStorageAccount account = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
             var client = account.CreateCloudTableClient();
             registrationTable = client.GetTableReference(Environment.GetEnvironmentVariable("TABLE_NAME"));
 
-            randomGenereator = new Random();   
-            // 1 Batch ( batch - 0 ) is exclusively for me         
-            batchCount = int.Parse(Environment.GetEnvironmentVariable("BATCH_COUNT"))+1;    
+            randomGenereator = new Random();
         }
         public static bool isUserExisting(RegistrationDTO user)
         {
@@ -79,7 +76,7 @@ namespace CoWinAlert.Utils
             
             try
             {
-                int batchId = randomGenereator.Next(1000) % batchCount;
+                int batchId = randomGenereator.Next(10000) % 12;
                 IEnumerable<RegistrationDTO> queriedResponse = registrationTable.ExecuteQuery(tableQuery)
                                                     .Select( _item => new RegistrationDTO(){
                                                         Batch = String.IsNullOrEmpty(_item.PartitionKey) ? 
