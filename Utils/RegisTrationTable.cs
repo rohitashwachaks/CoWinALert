@@ -58,7 +58,7 @@ namespace CoWinAlert.Utils
                                                                         QueryComparisons.Equal,
                                                                         true
                                                                     );
-            if(String.IsNullOrEmpty(partition)){
+            if(!String.IsNullOrEmpty(partition)){
                 string batchFilter = TableQuery.GenerateFilterCondition("PartitionKey",
                                                                 QueryComparisons.Equal,
                                                                 partition
