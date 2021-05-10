@@ -76,11 +76,10 @@ namespace CoWinAlert.Utils
             
             try
             {
-                int batchId = randomGenereator.Next(10000) % 12;
                 IEnumerable<RegistrationDTO> queriedResponse = registrationTable.ExecuteQuery(tableQuery)
                                                     .Select( _item => new RegistrationDTO(){
                                                         Batch = String.IsNullOrEmpty(_item.PartitionKey) ? 
-                                                                                    batchId.ToString()
+                                                                                    partition
                                                                                     : _item.PartitionKey,
                                                         EmailID = String.IsNullOrEmpty(_item.RowKey) ? 
                                                                                     null
