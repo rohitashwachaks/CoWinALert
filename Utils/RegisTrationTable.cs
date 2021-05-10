@@ -40,7 +40,7 @@ namespace CoWinAlert.Utils
         }
         public static string AddRowtoTable(RegistrationDTO user)
         {
-            string responseMessage = "\nUser Added Succesfully.\n";
+            string responseMessage = $"\nUser: {user.Name} Added Succesfully.\n";
             try{
                 RegistrationTableSchemaDTO reg = new RegistrationTableSchemaDTO(user);
                 TableOperation tableOperation = TableOperation.InsertOrReplace(reg);
@@ -115,6 +115,5 @@ namespace CoWinAlert.Utils
                 return new List<RegistrationDTO>().AsEnumerable();
             }
         }
-
     }
 }
