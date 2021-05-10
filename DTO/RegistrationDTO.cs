@@ -25,6 +25,18 @@ namespace CoWinAlert.DTO
         
         #endregion Private Members
         
+        public RegistrationDTO()
+        {
+            Random randomGenereator = new Random();
+
+            
+            int batchCount = int.Parse(Environment.GetEnvironmentVariable("BATCH_COUNT"));
+            // No 0 batch. Batch 0 for me exclusively.
+            batchCount = randomGenereator.Next(1000)%batchCount+1;
+            
+            Batch = String.IsNullOrEmpty(Batch)?  batchCount.ToString(): Batch;
+        }
+
         #region Public Members
         public string Name{
             get{
@@ -151,7 +163,7 @@ namespace CoWinAlert.DTO
                     _reasonPhrase += $"\nError in Phone Number Parsing. Input value = {value}";
                 }        
             }
-        }
+        }        
         [JsonIgnore]
         public string Vaccine
         { get
@@ -191,7 +203,8 @@ namespace CoWinAlert.DTO
                 }
             }
         }
-
+        [JsonIgnore]
+        public string Batch{get;set;}
         #endregion Public Members
 
         #region Public Functions        
@@ -210,15 +223,17 @@ namespace CoWinAlert.DTO
         public string PinCode{get;set;}
         public string DistrictCode{get;set;}
         public string Phone{get;set;}
+        public string Vaccine{get;set;}
         public string Payment{get;set;}
         public bool isActive{get;set;}
         public RegistrationTableSchemaDTO(){}
         public RegistrationTableSchemaDTO(RegistrationDTO inp, bool isStatusActive = true){
-            this.PartitionKey = inp.Vaccine.ToString();
+            this.PartitionKey = inp.Batch;
             this.RowKey = inp.EmailID;
             this.Phone = inp.Phone;
             this.Name = inp.Name;
             this.YearofBirth = inp.YearofBirth;
+            this.Vaccine = inp.Vaccine.ToString();
             this.PeriodDate = JsonConvert.SerializeObject(inp.PeriodDate);
             this.PinCode = JsonConvert.SerializeObject(inp.Codes);
             this.DistrictCode = JsonConvert.SerializeObject(inp.District);

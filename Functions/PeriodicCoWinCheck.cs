@@ -20,12 +20,16 @@ namespace CoWinAlert.Function
         //     ILogger log)
         [FunctionName("PeriodicCoWinCheck")]
         // [Disable]
-        public static async void Run([TimerTrigger("0 */30 * * * *")]TimerInfo myTimer, ILogger log)
+        public static async void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
         {
-            log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToShortDateString()}");
+            log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToString("dd\\-MM\\-yyyy")}");
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
-            
-            foreach(RegistrationDTO user in TableInfo.FetchUsers())
+
+            // Batch-0 for me exclusively.
+            int batchCount = int.Parse(Environment.GetEnvironmentVariable("BATCH_COUNT"))+1; 
+            batchCount = DateTime.Now.Minute / batchCount;
+
+            foreach(RegistrationDTO user in TableInfo.FetchUsers(batchCount.ToString()))
             {
                 log.LogInformation(JsonConvert.SerializeObject(user, Formatting.Indented));
                 
@@ -58,12 +62,11 @@ namespace CoWinAlert.Function
                 {
                     string htmlBody = Notifications.StructureSessionEmailBody(result);
                     // log.LogInformation(htmlBody);
-                    string response = await Notifications.SendEmail(
-                                                    userEmail: user.EmailID,
-                                                    userName: user.Name,
-                                                    htmlContent: htmlBody
-                                                );
-                    log.LogInformation(response);
+                    // string response = await Notifications.SendEmail(
+                    //                                 userEmail: user.EmailID,
+                    //                                 userName: user.Name,
+                    //                                 htmlContent: htmlBody);
+                    // log.LogInformation(response);
                 }
 
                 log.LogInformation(JsonConvert.SerializeObject(result, Formatting.Indented));
