@@ -31,7 +31,7 @@ namespace CoWinAlert.Function
                 
                 IEnumerable<DateTime> calendarDates = new List<DateTime>();
 
-                calendarDates = GetDateList(user.PeriodDate.StartDate, user.PeriodDate.EndDate);
+                calendarDates = GetDateList(user.PeriodDate.StartDate, user.PeriodDate.EndDate, log);
                 
                 log.LogInformation(JsonConvert.SerializeObject(calendarDates));
                 
@@ -41,7 +41,6 @@ namespace CoWinAlert.Function
                                                             user.District,
                                                             log))
                 {
-                    // ResponseDTO filteredResponse = new ResponseDTO();
                     // Process center iff Payment type matches
                     if(user.Payment == center.Fee_type.ToString()
                         ||user.Payment == FeeTypeDTO.ANY.ToString())
@@ -71,26 +70,31 @@ namespace CoWinAlert.Function
             }
         }
 
-        private static IEnumerable<DateTime> GetDateList(DateTime startDate, DateTime endDate)
+        private static IEnumerable<DateTime> GetDateList(DateTime startDate, DateTime endDate, ILogger log)
         {
-            TimeSpan periodDifference = endDate - startDate;
-            IEnumerable<DateTime> dateEnum = new List<DateTime>();
-            // if start date = end date
-                if(periodDifference == TimeSpan.FromDays(0))
-                {
-                    dateEnum = dateEnum.Append(startDate);
-                }
-                //else if start date - end date <= 7
-                else if(periodDifference > TimeSpan.FromDays(0))
-                {
-                    for(TimeSpan i = TimeSpan.FromDays(0);
-                        i <= periodDifference;
-                        i = i.Add(TimeSpan.FromDays(7)))
-                    {
-                        dateEnum = dateEnum.Append((startDate + i));
-                    }
-                }
-            return dateEnum;
+            int weekSpan = int.Parse(Environment.GetEnvironmentVariable("WEEK_LOOK_AHEAD"));
+            TimeSpan windowPeriod = TimeSpan.FromDays(7*weekSpan); // Look Ahead 7 weeks.
+            DateTime lastDate = DateTime.Now + windowPeriod;
+            
+            log.LogCritical($"Start Date: {startDate.ToShortDateString()}, End Date: {endDate.ToShortDateString()}");
+            log.LogCritical($"Date Now: {DateTime.Now.ToShortDateString()}, Last Date: {lastDate.ToShortDateString()}\n");
+
+            // Start Date is User Start Date or Current date, whichever is later.
+            startDate = (DateTime.Compare(DateTime.Now.Date, startDate.Date) < 0)? startDate : DateTime.Now;
+            // End Date is User End Date or Last date, whichever is earlier.
+            endDate = (DateTime.Compare(lastDate, endDate.Date) > 0)? endDate : lastDate;
+
+            log.LogCritical($"Start Date: {startDate.ToShortDateString()}, End Date: {endDate.ToShortDateString()}");
+
+            IEnumerable<DateTime> datelst = new List<DateTime>();
+            for(DateTime _date = startDate;
+                _date <= endDate;   // End Date will be included
+                _date = _date.Add(TimeSpan.FromDays(7)))
+            {
+                datelst = datelst.Append(_date);
+            }
+            log.LogInformation(JsonConvert.SerializeObject(datelst.Select(_dt => _dt.ToShortDateString()), Formatting.Indented));
+            return datelst;
         }
     }
 }
