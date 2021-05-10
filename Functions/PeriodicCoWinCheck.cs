@@ -33,7 +33,7 @@ namespace CoWinAlert.Function
 
                 calendarDates = GetDateList(user.PeriodDate.StartDate, user.PeriodDate.EndDate, log);
                 
-                log.LogInformation(JsonConvert.SerializeObject(calendarDates));
+                log.LogInformation(JsonConvert.SerializeObject(calendarDates, Formatting.Indented));
                 
                 await foreach(SessionCalendarDTO center in PingCoWin.GetResultAsync(
                                                             calendarDates, 
@@ -76,15 +76,10 @@ namespace CoWinAlert.Function
             TimeSpan windowPeriod = TimeSpan.FromDays(7*weekSpan); // Look Ahead 7 weeks.
             DateTime lastDate = DateTime.Now + windowPeriod;
             
-            log.LogCritical($"Start Date: {startDate.ToShortDateString()}, End Date: {endDate.ToShortDateString()}");
-            log.LogCritical($"Date Now: {DateTime.Now.ToShortDateString()}, Last Date: {lastDate.ToShortDateString()}\n");
-
             // Start Date is User Start Date or Current date, whichever is later.
             startDate = (DateTime.Compare(DateTime.Now.Date, startDate.Date) < 0)? startDate : DateTime.Now;
             // End Date is User End Date or Last date, whichever is earlier.
             endDate = (DateTime.Compare(lastDate, endDate.Date) > 0)? endDate : lastDate;
-
-            log.LogCritical($"Start Date: {startDate.ToShortDateString()}, End Date: {endDate.ToShortDateString()}");
 
             IEnumerable<DateTime> datelst = new List<DateTime>();
             for(DateTime _date = startDate;
@@ -93,7 +88,6 @@ namespace CoWinAlert.Function
             {
                 datelst = datelst.Append(_date);
             }
-            log.LogInformation(JsonConvert.SerializeObject(datelst.Select(_dt => _dt.ToShortDateString()), Formatting.Indented));
             return datelst;
         }
     }
