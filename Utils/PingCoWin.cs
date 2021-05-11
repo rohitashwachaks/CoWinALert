@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using CoWinAlert.DTO;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace CoWinAlert.Utils
 {
@@ -81,9 +80,6 @@ namespace CoWinAlert.Utils
                     {
                         yield return center;
                     }
-                    // List<SessionCalendarDTO> centers = JsonConvert.DeserializeObject<List<SessionCalendarDTO>>(jsonString);
-
-                    // yield return centers;
                 }
             }
         }
