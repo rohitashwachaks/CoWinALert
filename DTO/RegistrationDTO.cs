@@ -130,7 +130,7 @@ namespace CoWinAlert.DTO
                                                     Regex.IsMatch(_code.ToString(), @"^[0-9]+$")
                                                 )
                                                 .ToList();
-                    if(_pincodes.Count == 0){
+                    if(_districtcodes.Count == 0){
                         _isValid = false;
                     }
                 }
