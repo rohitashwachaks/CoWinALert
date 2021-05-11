@@ -66,8 +66,7 @@ namespace CoWinAlert.Function
                                                     htmlContent: htmlBody);
                     log.LogInformation(response);
                 }
-
-                log.LogInformation("Result"+JsonConvert.SerializeObject(result, Formatting.Indented));
+                // log.LogInformation("Result"+JsonConvert.SerializeObject(result, Formatting.Indented));
             }
         }
 

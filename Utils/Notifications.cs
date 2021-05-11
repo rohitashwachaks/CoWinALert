@@ -25,19 +25,19 @@ namespace CoWinAlert.Utils
                                             +"<strong>State:</strong> {3}<br>"
                                             +"<strong>District:</strong> {4}<br>"
                                             +"<strong>Pincode:</strong> {5}<br><p>";
-        private static string TIME_DETAILS = "<p><strong>Date:</strong> {0}<br>"
-                                            +"<strong>From:</strong> {1}<br>"
+        private static string TIME_DETAILS = "<p>"//<strong>Date:</strong> {0}<br>"
+                                            +"<strong>From:</strong> {1}        "
                                             +"<strong>To:</strong> {2}<br><p>";
         private static string FEE_DETAILS = "<p><ul><li><strong>Vaccine:</strong> {0}<br></li>"
                                             +"<li><strong>Fees:</strong> {1}<br></li></ul><p>";
         private static string TABLE_HEADER = "<table style=\"width:50%\"><tr>"
-                                            // +"<th>SessionDate</th>"
+                                            +"<th>SessionDate</th>"
                                             +"<th>Min_age_limit</th>"
                                             +"<th>Vaccine</th>"
                                             +"<th>Available_capacity</th>";
                                             // +"<th>Slots</th></tr>";
         private static string ROW_DETAILS = "<tr>"
-                                            // +"<td>{0}</td>"
+                                            +"<td>{0}</td>"
                                             +"<td>{1}</td>"
                                             +"<td>{2}</td>"
                                             +"<td>{3}</td>"
@@ -145,7 +145,7 @@ namespace CoWinAlert.Utils
                 foreach(SessionDTO session in center.Sessions)
                 {
                     emailBody.AppendFormat(ROW_DETAILS
-                                    ,session.SessionDate.ToShortTimeString()
+                                    ,session.SessionDate.ToString("dd\\-MM\\-yyyy")
                                     ,session.Min_age_limit.ToString()
                                     ,session.Vaccine.ToString()
                                     ,session.Available_capacity.ToString()
@@ -154,7 +154,7 @@ namespace CoWinAlert.Utils
                     // foreach(string slots in session.Slots)
                     // {
                     //     emailBody.AppendFormat(ROW_DETAILS
-                    //                 ,session.SessionDate.ToShortTimeString()
+                    //                 ,session.SessionDate.ToString("dd\\-MM\\-yyyy")
                     //                 ,session.Min_age_limit.ToString()
                     //                 ,session.Vaccine.ToString()
                     //                 ,session.Available_capacity.ToString()
