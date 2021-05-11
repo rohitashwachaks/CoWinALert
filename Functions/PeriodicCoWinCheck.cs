@@ -59,7 +59,7 @@ namespace CoWinAlert.Function
                 if(result.ToList().Count > 0)
                 {
                     string htmlBody = Notifications.StructureSessionEmailBody(result);
-                    log.LogInformation(htmlBody);
+                    // log.LogInformation(htmlBody);
                     string response = await Notifications.SendEmail(
                                                     userEmail: user.EmailID,
                                                     userName: user.Name,
