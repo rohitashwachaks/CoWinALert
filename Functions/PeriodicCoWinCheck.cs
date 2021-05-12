@@ -35,7 +35,7 @@ namespace CoWinAlert.Function
 
                 calendarDates = GetDateList(user.PeriodDate.StartDate, user.PeriodDate.EndDate, log);
                 
-                log.LogInformation("Calendar Dates: \n"+JsonConvert.SerializeObject(calendarDates, Formatting.Indented));
+                log.LogInformation($"{user.Name}'s Calendar Dates: \n"+JsonConvert.SerializeObject(calendarDates, Formatting.Indented));
                 
                 await foreach(SessionCalendarDTO center in PingCoWin.GetResultAsync(
                                                             calendarDates, 
@@ -64,9 +64,9 @@ namespace CoWinAlert.Function
                                                     userEmail: user.EmailID,
                                                     userName: user.Name,
                                                     htmlContent: htmlBody);
-                    log.LogInformation(response);
+                    log.LogInformation($"{user.Name}'s Response:"+response);
                 }
-                log.LogInformation("Result"+JsonConvert.SerializeObject(result, Formatting.Indented));
+                log.LogInformation($"{user.Name}'s Result\n"+JsonConvert.SerializeObject(result, Formatting.Indented));
             }
         }
 

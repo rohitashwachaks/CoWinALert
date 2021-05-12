@@ -67,7 +67,7 @@ namespace CoWinAlert.Utils
                 lstResponse = lstResponse.Concat(lstPin);
                 lstResponse = lstResponse.Concat(lstDist);
             }
-            int x = lstResponse.Count();
+            log.LogInformation($"Ping code:{pincodes}\n Pingcount: {lstResponse.Count()}");
             IEnumerable<HttpResponseMessage> responses = await Task.WhenAll(lstResponse);
 
             foreach(HttpResponseMessage responseMessage in responses)
