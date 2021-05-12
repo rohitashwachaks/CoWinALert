@@ -102,8 +102,8 @@ namespace CoWinAlert.Utils
                                                         Phone = _item.Properties.ContainsKey("Phone") ?
                                                                                     _item.Properties["Phone"].StringValue 
                                                                                     : null,
-                                                        PinCode = _item.Properties.ContainsKey("Pincode") ?
-                                                                                    _item.Properties["Pincode"].StringValue 
+                                                        PinCode = _item.Properties.ContainsKey("PinCode") ?
+                                                                                    _item.Properties["PinCode"].StringValue 
                                                                                     : null,
                                                         DistrictCode = _item.Properties.ContainsKey("DistrictCode") ?
                                                                                     _item.Properties["DistrictCode"].StringValue 
