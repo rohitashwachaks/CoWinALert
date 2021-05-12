@@ -67,13 +67,15 @@ namespace CoWinAlert.Utils
                 lstResponse = lstResponse.Concat(lstPin);
                 lstResponse = lstResponse.Concat(lstDist);
             }
-            log.LogInformation($"PinCodes:{JsonConvert.SerializeObject(pincodes)}\n Pingcount: {lstResponse.Count()}");
             IEnumerable<HttpResponseMessage> responses = await Task.WhenAll(lstResponse);
 
+            int successCount = 0;
+            IEnumerable<string> resCount = new List<string>();
             foreach(HttpResponseMessage responseMessage in responses)
             {
                 if(responseMessage.IsSuccessStatusCode)
                 {
+                    ++successCount;
                     string jsonString = await responseMessage.Content.ReadAsStringAsync();
                     CentersDTO centerLst = JsonConvert.DeserializeObject<CentersDTO>(jsonString);
                     foreach(SessionCalendarDTO center in centerLst.Centers)
@@ -81,11 +83,12 @@ namespace CoWinAlert.Utils
                         yield return center;
                     }
                 }
-                else
-                {
-                    log.LogCritical($"Response code: {responseMessage.StatusCode}. Reason: {responseMessage.ReasonPhrase}");
-                }
+                resCount = resCount.Append($"Reason: {responseMessage.ReasonPhrase}");
             }
+            log.LogInformation($"PinCodes:{pincodes.ToList().Count.ToString()}\n"
+                            +$"Pingcount: {lstResponse.Count()}\n"
+                            +$"SuccessCount: {successCount.ToString()}\n"
+                            +$"FailedReason: {JsonConvert.SerializeObject(resCount)}");
         }
         #endregion Async Calls
         #region Helper Functions
