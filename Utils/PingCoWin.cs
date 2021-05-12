@@ -47,7 +47,7 @@ namespace CoWinAlert.Utils
         public static Task<HttpResponseMessage> CalendarByPin(long pincode, DateTime date, ILogger logger)
         {
             string url = PingAction.CalendarByPin.ToDescriptionString()+$"pincode={pincode.ToString()}&date={date.ToString("dd\\-MM\\-yyyy")}";
-            logger.LogCritical(url);
+            // logger.LogCritical(url);
             return client.GetAsync(url);
         }
         #endregion Structure URLS
@@ -67,7 +67,7 @@ namespace CoWinAlert.Utils
                 lstResponse = lstResponse.Concat(lstPin);
                 lstResponse = lstResponse.Concat(lstDist);
             }
-            log.LogInformation($"Ping code:{pincodes}\n Pingcount: {lstResponse.Count()}");
+            log.LogInformation($"PinCodes:{JsonConvert.SerializeObject(pincodes)}\n Pingcount: {lstResponse.Count()}");
             IEnumerable<HttpResponseMessage> responses = await Task.WhenAll(lstResponse);
 
             foreach(HttpResponseMessage responseMessage in responses)
@@ -80,6 +80,10 @@ namespace CoWinAlert.Utils
                     {
                         yield return center;
                     }
+                }
+                else
+                {
+                    log.LogCritical($"Response code: {responseMessage.StatusCode}. Reason: {responseMessage.ReasonPhrase}");
                 }
             }
         }

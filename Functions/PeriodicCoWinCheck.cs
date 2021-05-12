@@ -22,10 +22,10 @@ namespace CoWinAlert.Function
         // [Disable]
         public static async void Run([TimerTrigger("0 2-59/5 * * * *")]TimerInfo myTimer, ILogger log)
         {
-            log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToString("dd\\-MM\\-yyyy HH:MM:ss")}");
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
-
             int batchCount = DateTime.Now.Minute / 5;
+
+            log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToString("dd\\-MM\\-yyyy HH:MM:ss")}\nFetching Batch: {batchCount}");
 
             foreach(RegistrationDTO user in TableInfo.FetchUsers(batchCount.ToString()))
             {
