@@ -25,7 +25,7 @@ namespace CoWinAlert.Function
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
             int batchCount = DateTime.Now.Minute / 5;
 
-            log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToString("dd\\-MM\\-yyyy HH:MM:ss")}\nFetching Batch: {batchCount}");
+            log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToString("dd\\-MM\\-yyyy HH:mm:ss")}\nFetching Batch: {batchCount}");
 
             foreach(RegistrationDTO user in TableInfo.FetchUsers(batchCount.ToString()))
             {
