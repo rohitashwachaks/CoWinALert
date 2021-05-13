@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using CoWinAlert.DTO;
 using CoWinAlert.Utils;
 using Microsoft.AspNetCore.Http;
