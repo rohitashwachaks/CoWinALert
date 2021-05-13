@@ -21,7 +21,7 @@ namespace CoWinAlert.Function
         //     ILogger log)
         [FunctionName("PeriodicCoWinCheck")]
         // [Disable]
-        public static async void Run([TimerTrigger("0 2-59/5 */6 * * *")]TimerInfo myTimer, ILogger log)
+        public static async void Run([TimerTrigger("0 2-59/5 * * * *")]TimerInfo myTimer, ILogger log)
         {
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
             int batchCount = DateTime.Now.Minute / 5;
