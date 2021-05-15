@@ -151,16 +151,6 @@ namespace CoWinAlert.Utils
                                     ,session.Available_capacity.ToString()
                                     // ,slots
                                 );
-                    // foreach(string slots in session.Slots)
-                    // {
-                    //     emailBody.AppendFormat(ROW_DETAILS
-                    //                 ,session.SessionDate.ToString("dd\\-MM\\-yyyy")
-                    //                 ,session.Min_age_limit.ToString()
-                    //                 ,session.Vaccine.ToString()
-                    //                 ,session.Available_capacity.ToString()
-                    //                 ,slots
-                    //             );
-                    // }
                     emailBody.Append(TABLE_BREAK);
                 }
                 emailBody.Append(TABLE_END);
