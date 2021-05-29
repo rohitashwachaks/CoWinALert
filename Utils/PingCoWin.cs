@@ -88,7 +88,7 @@ namespace CoWinAlert.Utils
             log.LogInformation($"PinCodes:{pincodes.ToList().Count.ToString()}\n"
                             +$"Pingcount: {lstResponse.Count()}\n"
                             +$"SuccessCount: {successCount.ToString()}\n"
-                            +$"FailedReason: {JsonConvert.SerializeObject(resCount)}");
+                            +$"ReasonPhrase: {JsonConvert.SerializeObject(resCount)}");
         }
         #endregion Async Calls
         #region Helper Functions

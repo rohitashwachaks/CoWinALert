@@ -21,7 +21,7 @@ namespace CoWinAlert.Function
         ///Function to Register Users and their Preferences
         [FunctionName("api-registration")]
         [OpenApiOperation]
-        [OpenApiIgnore]
+        //[OpenApiIgnore]
         [OpenApiParameter("vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(Vaccine))]
         [OpenApiParameter("payment", In = ParameterLocation.Query, Required = true, Type = typeof(FeeTypeDTO))]
         [OpenApiRequestBody("application/json", typeof(RegistrationDTO))]

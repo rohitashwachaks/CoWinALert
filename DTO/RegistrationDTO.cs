@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -241,7 +242,9 @@ namespace CoWinAlert.DTO
     public enum Vaccine{
         ANY,
         COVISHIELD,
-        COVAXIN
+        COVAXIN,
+        [Display(name:"SPUTNIK")]
+        SPUTNIKV
     }
     [JsonConverter(typeof(StringEnumConverter))]
     public enum FeeTypeDTO
