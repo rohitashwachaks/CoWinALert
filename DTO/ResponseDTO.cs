@@ -25,7 +25,8 @@ namespace CoWinAlert.DTO
         {            
             set
             {
-                _date = DateTime.ParseExact(value, "mm-dd-yyyy", CultureInfo.InvariantCulture);
+              string date_format = Environment.GetEnvironmentVariable("DATE_FORMAT");
+                _date = DateTime.ParseExact(value, date_format, CultureInfo.InvariantCulture);
             }
         }
         public int Available_capacity{get; set;}
