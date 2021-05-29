@@ -12,14 +12,7 @@ namespace CoWinAlert.Function
 {
     public static class PeriodicCoWinCheck
     {
-        /// Function to periodically ceheck CoWin
-        // [FunctionName("cowin-check")]
-        // [OpenApiOperation]
-        // public static async Task<HttpResponseMessage> RunAsync(
-        //     [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "cowin/check")] HttpRequest req,
-        //     ILogger log)
         [FunctionName("PeriodicCoWinCheck")]
-        // [Disable]
         public static async void Run([TimerTrigger("0 2-59/5 * * * *")]TimerInfo myTimer, ILogger log)
         {
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
@@ -27,49 +20,66 @@ namespace CoWinAlert.Function
 
             log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToString("dd\\-MM\\-yyyy HH:mm:ss")}\nFetching Batch: {batchCount}");
 
-            foreach(RegistrationDTO user in TableInfo.FetchUsers(batchCount.ToString()))
+            IEnumerable<RegistrationDTO> userList = TableInfo.FetchUsers(batchCount.ToString());
+            log.LogInformation($"Users in Batch:\n{JsonConvert.SerializeObject(userList.Select(x => x.Name), Formatting.Indented)}");
+
+            foreach(RegistrationDTO user in userList)
             {
-                log.LogInformation(JsonConvert.SerializeObject(user, Formatting.Indented));
-                
                 IEnumerable<DateTime> calendarDates = new List<DateTime>();
 
                 calendarDates = GetDateList(user.PeriodDate.StartDate, user.PeriodDate.EndDate, log);
                 
                 log.LogInformation($"{user.Name}'s Calendar Dates: \n"+JsonConvert.SerializeObject(calendarDates, Formatting.Indented));
                 
-                await foreach(SessionCalendarDTO center in PingCoWin.GetResultAsync(
+                try
+                {
+                    await foreach(SessionCalendarDTO center in PingCoWin.GetResultAsync(
                                                             calendarDates, 
                                                             user.Codes,
                                                             user.District,
                                                             log))
-                {
-                    // Process center iff Payment type matches
-                    if(user.Payment == center.Fee_type.ToString()
-                        ||user.Payment == FeeTypeDTO.ANY.ToString())
                     {
-                        center.Sessions = PingCoWin.GetFilteredSessions(center.Sessions, user);
-
-                        if(center.Sessions.Count > 0 )
+                        // Process center iff Payment type matches
+                        if(user.Payment == center.Fee_type.ToString()
+                            ||user.Payment == FeeTypeDTO.ANY.ToString())
                         {
-                            result = result.Append(center);
+                            center.Sessions = PingCoWin.GetFilteredSessions(center.Sessions, user);
+
+                            if(center.Sessions.Count > 0 )
+                            {
+                                result = result.Append(center);
+                            }
                         }
                     }
                 }
-
-                if(result.ToList().Count > 0)
+                catch(Exception ex)
                 {
-                    string htmlBody = Notifications.StructureSessionEmailBody(result);
-                    
-                    string response = await Notifications.SendEmail(
-                                                    userEmail: user.EmailID,
-                                                    userName: user.Name,
-                                                    htmlContent: htmlBody);
-                    log.LogInformation($"{user.Name}'s Response:"+response);
+                    log.LogError(ex.Message);
+                    log.LogError(JsonConvert.SerializeObject(ex.InnerException, Formatting.Indented));
+                    log.LogError(ex.StackTrace);
                 }
+
                 log.LogInformation($"{user.Name}'s Result\n"+JsonConvert.SerializeObject(result, Formatting.Indented));
+
+                try
+                {
+                    if(result.ToList().Count > 0)
+                    {
+                        string htmlBody = Notifications.StructureSessionEmailBody(user.Name, result);
+                        
+                        string response = await Notifications.SendEmail(
+                                                        userEmail: user.EmailID,
+                                                        userName: user.Name,
+                                                        htmlContent: htmlBody);
+                        log.LogInformation($"{user.Name}'s Response:"+response);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    log.LogError(ex.Message);
+                }
             }
         }
-
         private static IEnumerable<DateTime> GetDateList(DateTime startDate, DateTime endDate, ILogger log)
         {
             int weekSpan = int.Parse(Environment.GetEnvironmentVariable("WEEK_LOOK_AHEAD"));
@@ -86,7 +96,7 @@ namespace CoWinAlert.Function
                 _date <= endDate;   // End Date will be included
                 _date = _date.Add(TimeSpan.FromDays(7)))
             {
-                datelst = datelst.Append(_date);
+                datelst = datelst.Append(_date.Date);
             }
             return datelst;
         }

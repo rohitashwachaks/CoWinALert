@@ -109,11 +109,15 @@ namespace CoWinAlert.Utils
                                                         (await response.Body.ReadAsStringAsync());
             return responseMessage;
         }
-        public static string StructureSessionEmailBody(IEnumerable<SessionCalendarDTO> input)
+        public static string StructureSessionEmailBody(string name, IEnumerable<SessionCalendarDTO> input)
         {
             StringBuilder emailBody = new StringBuilder();
             foreach(SessionCalendarDTO center in input)
             {
+                emailBody.AppendFormat("<p>Hi, {0}<p><p>"
+                                ,name
+                            );
+
                 emailBody.AppendFormat(CENTER_DETAILS
                                 ,center.Center_id
                                 ,center.Name

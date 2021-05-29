@@ -25,7 +25,7 @@ namespace CoWinAlert.DTO
         {            
             set
             {
-                _date = DateTime.Parse(value);//DateTime.ParseExact(value, "mm-dd-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                _date = DateTime.ParseExact(value, "mm-dd-yyyy", CultureInfo.InvariantCulture);
             }
         }
         public int Available_capacity{get; set;}
