@@ -1,0 +1,11 @@
+{
+    "IsEncrypted": false,
+    "Values": {
+        "AzureWebJobsStorage": "STORAGE ACCOUNT CONNECTION STRING",
+        "DATE_FORMAT": "dd-MM-yyyy",
+        "SENDGRID_API_KEY": "SEND GRID API KEY",
+        "TABLE_NAME": "TABLE_NAME TO WORK ON",
+        "WEEK_LOOK_AHEAD": 4,
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+    }
+}
