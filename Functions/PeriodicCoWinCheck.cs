@@ -71,7 +71,7 @@ namespace CoWinAlert.Function
                                                         userEmail: user.EmailID,
                                                         userName: user.Name,
                                                         htmlContent: htmlBody);
-                        log.LogInformation($"{user.Name}'s Response:"+response);
+                        log.LogInformation($"{user.Name}'s Response:\n"+response);
                     }
                 }
                 catch(Exception ex)
