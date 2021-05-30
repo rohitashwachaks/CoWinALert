@@ -13,7 +13,7 @@ namespace CoWinAlert.Function
     public static class PeriodicCoWinCheck
     {
         [FunctionName("PeriodicCoWinCheck")]
-        public static async void Run([TimerTrigger("0 2-59/5 * * * *")]TimerInfo myTimer, ILogger log)
+        public static async void Run([TimerTrigger("0 2-59/5 */4 * * *")]TimerInfo myTimer, ILogger log)
         {
             IEnumerable<SessionCalendarDTO> result = new List<SessionCalendarDTO>();
             int batchCount = DateTime.Now.Minute / 5;
