@@ -29,7 +29,8 @@ In the text box, **DELETE ALL TEXT AND REPLACE** with the following text
     "startDate": "2021-05-10",
     "endDate": "2021-05-20"
   },
-  "pinCode": "[201607,110292]"
+  "districtCode": "[112,132,143,101]",
+  "pinCode": "[201607,110292]",
   "phone": "1234567890"
 }
 ```
