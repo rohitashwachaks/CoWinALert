@@ -67,11 +67,11 @@ namespace CoWinAlert.Function
                     {
                         string htmlBody = Notifications.StructureSessionEmailBody(user.Name, result);
                         
-                        // string response = await Notifications.SendEmail(
-                        //                                 userEmail: user.EmailID,
-                        //                                 userName: user.Name,
-                        //                                 htmlContent: htmlBody);
-                        // log.LogInformation($"{user.Name}'s Response:\n"+response);
+                        string response = await Notifications.SendEmail(
+                                                        userEmail: user.EmailID,
+                                                        userName: user.Name,
+                                                        htmlContent: htmlBody);
+                        log.LogInformation($"{user.Name}'s Response:\n"+response);
                     }
                 }
                 catch(Exception ex)
