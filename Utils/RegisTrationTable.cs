@@ -52,7 +52,7 @@ namespace CoWinAlert.Utils
             }
             return responseMessage;
         }
-        public static IEnumerable<RegistrationDTO> FetchUsers(string partition = null, string vaccineName = null)
+        public static IEnumerable<RegistrationDTO> FetchPartition(string partition = null, string vaccineName = null)
         {
             string filter = TableQuery.GenerateFilterConditionForBool("isActive",
                                                                         QueryComparisons.Equal,
@@ -113,6 +113,68 @@ namespace CoWinAlert.Utils
             }
             catch{
                 return new List<RegistrationDTO>().AsEnumerable();
+            }
+        }
+        public static RegistrationDTO FetchUser(string emailId = null, string phone = null)
+        {
+            string filter = TableQuery.GenerateFilterCondition("RowKey",
+                                                            QueryComparisons.Equal,
+                                                            emailId
+                                                        );
+            string phoneFilter = TableQuery.GenerateFilterCondition("Phone",
+                                                            QueryComparisons.Equal,
+                                                            phone
+                                                        );
+            filter = TableQuery.CombineFilters(filter, TableOperators.And, phoneFilter);
+
+            // string filter = TableQuery.GenerateFilterConditionForBool("isActive",
+            //                                                             QueryComparisons.Equal,
+            //                                                             true
+            //                                                         );
+            // filter = TableQuery.CombineFilters(emailFilter, TableOperators.And, filter);
+
+            TableQuery tableQuery = new TableQuery().Where(filter);
+            RegistrationDTO queriedResponse = new RegistrationDTO();
+            try
+            {
+                queriedResponse = registrationTable.ExecuteQuery(tableQuery)
+                                            .Select( _item => new RegistrationDTO(){
+                                                Batch = String.IsNullOrEmpty(_item.PartitionKey) ? 
+                                                                            null
+                                                                            : _item.PartitionKey,
+                                                EmailID = String.IsNullOrEmpty(_item.RowKey) ? 
+                                                                            null
+                                                                            : _item.RowKey,
+                                                Vaccine = _item.Properties.ContainsKey("Vaccine") ? 
+                                                                            _item.Properties["Vaccine"].StringValue
+                                                                            : "ANY",
+                                                Payment = _item.Properties.ContainsKey("Payment") ? 
+                                                                            _item.Properties["Payment"].StringValue
+                                                                            :"ANY",
+                                                Name = _item.Properties.ContainsKey("Name") ?
+                                                                            _item.Properties["Name"].StringValue 
+                                                                            : null,
+                                                PeriodDate = _item.Properties.ContainsKey("PeriodDate") ?
+                                                                            JsonConvert.DeserializeObject<DateRangeDTO>(_item.Properties["PeriodDate"].StringValue) 
+                                                                            : new DateRangeDTO(){},
+                                                YearofBirth = (int)(_item.Properties.ContainsKey("YearofBirth") ?
+                                                                            _item.Properties["YearofBirth"].Int32Value 
+                                                                            : DateTime.Now.Year - 45),
+                                                Phone = _item.Properties.ContainsKey("Phone") ?
+                                                                            _item.Properties["Phone"].StringValue 
+                                                                            : null,
+                                                PinCode = _item.Properties.ContainsKey("PinCode") ?
+                                                                            _item.Properties["PinCode"].StringValue 
+                                                                            : null,
+                                                DistrictCode = _item.Properties.ContainsKey("DistrictCode") ?
+                                                                            _item.Properties["DistrictCode"].StringValue 
+                                                                            : null
+                                                    })
+                                                    .First();
+                return queriedResponse;
+            }
+            catch(Exception ex){
+                return queriedResponse;
             }
         }
     }

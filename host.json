@@ -1,26 +1,30 @@
 {
   "version": "2.0",
   "logging": {
-      "applicationInsights": {
-          "samplingSettings": {
-              "isEnabled": true,
-              "excludedTypes": "Request"
-          }
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true
       }
+    }
   },
-  "openApi": {
-      "info": {
-        "version": "1.0.0",
-        "title": "CoWin Alert",
-        "description": "Register Yourself Here.\n Add your details and get notified whenever a vaccination slot opens up!.\n **Stay Ahead of the Curve.**",
-        "contact": {
-          "name": "Captain Nemo",
-          "email": "captain.nemo.github@gmail.com"
-        },
-        "license": {
-          "name": "LinkedIn",
-          "url": "https://www.linkedin.com/in/rohitashwachaks/"
-        }
+  "openApi": 
+  {
+    "info": 
+    {
+      "version": "1.0.0",
+      "title": "CoWin Alert",
+      "description": "Register Yourself Here.\n Add your details and get notified whenever a vaccination slot opens up!.\n **Stay Ahead of the Curve.**",
+      "contact": 
+      {
+        "name": "Captain Nemo",
+        "email": "captain.nemo.github@gmail.com",
+        "instagram": ""
+      },
+      "license": 
+      {
+        "name": "LinkedIn",
+        "url": "https://www.linkedin.com/in/rohitashwachaks/"
       }
+    }
   }
 }

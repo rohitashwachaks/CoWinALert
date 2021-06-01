@@ -1,7 +1,5 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
@@ -12,27 +10,28 @@ using CoWinAlert.DTO;
 using CoWinAlert.Utils;
 using System.Net;
 using System.Net.Http;
-using Aliencube.AzureFunctions.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
 
 namespace CoWinAlert.Function
 {
-    public static class StructureInput
+    public static class UserRegistration
     {
         [FunctionName("user-registration")]
-        [OpenApiOperation]
-        [OpenApiParameter("name", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
-        [OpenApiParameter("email", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
-        [OpenApiParameter("phone", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
-        [OpenApiParameter("birth-year", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
-        [OpenApiParameter("search-start-date-yyyy-mm-dd", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
-        [OpenApiParameter("search-end-date-yyyy-mm-dd", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
-        [OpenApiParameter("pincode", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
-        [OpenApiParameter("vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(Vaccine))]
-        [OpenApiParameter("payment", In = ParameterLocation.Query, Required = true, Type = typeof(FeeTypeDTO))]
+        [OpenApiOperation(tags: new[] { "User" }, Description = "Registration for Users")]
+        //[OpenApiIgnore]
+        [OpenApiParameter(name:"name", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "Name")]
+        [OpenApiParameter(name:"email", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "Contanct Email-Id")]
+        [OpenApiParameter(name:"phone", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "**10 digit** Phone Number")]
+        [OpenApiParameter(name:"birth-year", In = ParameterLocation.Query, Required = true, Type = typeof(int), Description = "Year of Birth")]
+        [OpenApiParameter(name:"start-date", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "Search Start Date ( Format: **_YYYY-MM-DD_**)")]
+        [OpenApiParameter(name:"end-date", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "Search End Date ( Format: **_YYYY-MM-DD_**)")]
+        [OpenApiParameter(name:"pincode", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "Select Pincode(s)")]
+        [OpenApiParameter(name:"vaccine", In = ParameterLocation.Query, Required = true, Type = typeof(Vaccine), Description = "Select Vaccine Preference")]
+        [OpenApiParameter(name:"payment", In = ParameterLocation.Query, Required = true, Type = typeof(FeeTypeDTO), Description = "Select Payment Preference")]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(InputDTO))]
-        [OpenApiResponseWithBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
+        [OpenApiResponseWithBody(HttpStatusCode.BadRequest, "text/plain", typeof(string))]
         [OpenApiResponseWithBody(HttpStatusCode.InternalServerError, "application/json", typeof(JObject))]
         public static async Task<HttpResponseMessage> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "user/registration")] HttpRequest req,
@@ -47,8 +46,8 @@ namespace CoWinAlert.Function
                 inputResult.Phone = HttpUtility.HtmlEncode(req.Query["phone"]);
                 inputResult.YearofBirth = Int16.Parse(HttpUtility.HtmlEncode(req.Query["birth-year"]));
                 inputResult.PeriodDate = new DateRangeDTO(){
-                                                        StartDate = DateTime.Parse(HttpUtility.HtmlEncode(req.Query["search-start-date-yyyy-mm-dd"])),
-                                                        EndDate = DateTime.Parse(HttpUtility.HtmlEncode(req.Query["search-end-date-yyyy-mm-dd"]))
+                                                        StartDate = DateTime.Parse(HttpUtility.HtmlEncode(req.Query["start-date"])),
+                                                        EndDate = DateTime.Parse(HttpUtility.HtmlEncode(req.Query["end-date"]))
                                                     };
                 inputResult.PinCode = JsonConvert.SerializeObject(HttpUtility.HtmlEncode(req.Query["pincode"]).Split(","));
                 inputResult.Vaccine = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());

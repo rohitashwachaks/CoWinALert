@@ -20,7 +20,7 @@ namespace CoWinAlert.Function
 
             log.LogInformation($"Cowin website pinged at: {DateTime.Now.ToString("dd\\-MM\\-yyyy HH:mm:ss")}\nFetching Batch: {batchCount}");
 
-            IEnumerable<RegistrationDTO> userList = TableInfo.FetchUsers(batchCount.ToString());
+            IEnumerable<RegistrationDTO> userList = TableInfo.FetchPartition(batchCount.ToString());
             log.LogInformation($"Users in Batch:\n{JsonConvert.SerializeObject(userList.Select(x => x.Name), Formatting.Indented)}");
 
             foreach(RegistrationDTO user in userList)
@@ -67,11 +67,11 @@ namespace CoWinAlert.Function
                     {
                         string htmlBody = Notifications.StructureSessionEmailBody(user.Name, result);
                         
-                        string response = await Notifications.SendEmail(
-                                                        userEmail: user.EmailID,
-                                                        userName: user.Name,
-                                                        htmlContent: htmlBody);
-                        log.LogInformation($"{user.Name}'s Response:\n"+response);
+                        // string response = await Notifications.SendEmail(
+                        //                                 userEmail: user.EmailID,
+                        //                                 userName: user.Name,
+                        //                                 htmlContent: htmlBody);
+                        // log.LogInformation($"{user.Name}'s Response:\n"+response);
                     }
                 }
                 catch(Exception ex)
