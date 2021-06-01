@@ -2,7 +2,7 @@
 
 Queries CoWin and notifies user if slot opens up
 
-*Link:* <https://cowin-alert.azurewebsites.net/api/swagger/ui?code=iA8UBiyrJn5CAXaKuOQ8KehuJVpz6p/GU/gRfaEgEYEa75LUlcUkEA==>
+*[Link](https://vaccine-track.azurewebsites.net/api/swagger/ui?code=GQG%2FXjfaKcgXIYM5qvw5ryOTIABv%2F51gqNZWZiOzPQTybYI5HFCWdQ%3D%3D)*
 
 ## Step-1
 
@@ -20,7 +20,8 @@ Select your Vaccine and Payment Preference.
 
 In the text box, **DELETE ALL TEXT AND REPLACE** with the following text
 
-```{
+```JSON
+{
   "name": "John Doe",
   "emailID": "john.doe@apple.com",
   "yearofBirth": 1973,
@@ -30,7 +31,8 @@ In the text box, **DELETE ALL TEXT AND REPLACE** with the following text
   },
   "pinCode": "[201607,110292]"
   "phone": "1234567890"
-}```
+}
+```
 
 Please note:
 
