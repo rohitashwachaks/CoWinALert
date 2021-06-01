@@ -26,6 +26,8 @@ namespace CoWinAlert.Function
         [OpenApiParameter("payment", In = ParameterLocation.Query, Required = true, Type = typeof(FeeTypeDTO))]
         [OpenApiRequestBody("application/json", typeof(RegistrationDTO))]
         [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(InputDTO))]
+        [OpenApiResponseWithBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
+        [OpenApiResponseWithBody(HttpStatusCode.InternalServerError, "application/json", typeof(string))]
         public static async Task<HttpResponseMessage> RunAsync(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "api/user-registration")] HttpRequest req,
             ILogger log)
@@ -41,7 +43,7 @@ namespace CoWinAlert.Function
             catch(Exception ex){
                 return HttpResponseHandler.StructureResponse(reason: "Invalid Query Parameters",
                                                         content: ex.StackTrace,
-                                                        code: HttpStatusCode.InternalServerError 
+                                                        code: HttpStatusCode.BadRequest 
                                                     );
             }
             
@@ -65,8 +67,8 @@ namespace CoWinAlert.Function
                 responseMessage += $"{registrationData.Name}, ";
 
                 // Check if it exists in table
-                if(TableInfo.isUserExisting(registrationData) &&
-                    registrationData.isValid()
+                if(TableInfo.isUserExisting(registrationData)
+                    && registrationData.isValid()
                 ){
                     // Add to Table
                     string x = TableInfo.AddRowtoTable(registrationData);

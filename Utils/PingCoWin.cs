@@ -117,10 +117,12 @@ namespace CoWinAlert.Utils
                                     // Available Capacity > 0
                                     &&(_session.Available_capacity > 0)
                                     // Vaccine of Choice
-                                    &&(user.Vaccine ==_session.Vaccine
-                                        ||user.Vaccine == DTO.Vaccine.ANY.ToString()
-                                        ||_session.Vaccine == DTO.Vaccine.ANY.ToString()
-                                    )
+                                    &&(user.Vaccine.Contains(_session.Vaccine)
+                                        || user.Vaccine == DTO.Vaccine.ANY.ToString()
+                                        ||_session.Vaccine == DTO.Vaccine.ANY.ToString())
+                                    // &&(user.Vaccine ==_session.Vaccine
+                                    //     ||user.Vaccine == DTO.Vaccine.ANY.ToString()
+                                    //     ||_session.Vaccine == DTO.Vaccine.ANY.ToString())
                                 ).Select(_session => _session)
                                 .ToList();
             }

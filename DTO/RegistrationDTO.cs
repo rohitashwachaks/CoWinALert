@@ -15,7 +15,7 @@ namespace CoWinAlert.DTO
         #region Private Members
         private bool _isValid = true;
         private string _reasonPhrase = "";
-        private Vaccine _vaccine = DTO.Vaccine.ANY;
+        private List<Vaccine> _vaccine = new List<Vaccine>(){ DTO.Vaccine.ANY };
         private FeeTypeDTO _payment = DTO.FeeTypeDTO.ANY;
         private List<long> _pincodes = new List<long>();
         private List<int> _districtcodes = new List<int>();
@@ -162,20 +162,31 @@ namespace CoWinAlert.DTO
         }        
         [JsonIgnore]
         public string Vaccine
-        { get
+        { 
+            get
             {
-                return _vaccine.ToString();
+                return JsonConvert.SerializeObject(_vaccine);//_vaccine.ToString();
             } 
             set
             {
                 try
                 {
-                    _vaccine = (Vaccine)Enum.Parse(typeof(Vaccine), value.ToUpper());
+                    try{
+                        _vaccine = JsonConvert.DeserializeObject<List<Vaccine>>(value).ToList();
+                        if(_vaccine.Count == 0){
+                            _isValid = false;
+                        }
+                    }
+                    catch{
+                        _vaccine = value.Split(",")
+                                        .Select(_item => (Vaccine)Enum.Parse(typeof(Vaccine), _item.ToUpper()))
+                                        .ToList();
+                    }
                 }
                 catch
                 {
                     _isValid = false;
-                    _reasonPhrase += $"\nError in Vaccine Parsing. Input value = {value}";
+                    _reasonPhrase += $"\nError in Pin Code Parsing. Input value = {value}";
                 }
             }
         }
