@@ -122,7 +122,6 @@ namespace CoWinAlert.DTO
                 return _districtcodes;
             }
         }
-        [JsonIgnore]
         public string DistrictCode{
             set{
                 try{
