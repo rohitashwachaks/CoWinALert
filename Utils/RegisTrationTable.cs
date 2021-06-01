@@ -173,7 +173,7 @@ namespace CoWinAlert.Utils
                                                     .First();
                 return queriedResponse;
             }
-            catch(Exception ex){
+            catch{
                 return queriedResponse;
             }
         }
