@@ -29,7 +29,8 @@ namespace CoWinAlert.Function
         [OpenApiParameter(name: "payment", In = ParameterLocation.Query, Required = true, Type = typeof(FeeTypeDTO), Description = "Payment Preference")]
         [OpenApiRequestBody("application/json", typeof(RegistrationDTO))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(InputDTO), Description = "The OK Response")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.BadRequest, contentType: "text/plain", bodyType: typeof(string), Description = "The BadRequest Response")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.BadRequest, contentType: "text/plain", bodyType: typeof(string), Description = "The Invalid Input Response")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.Conflict, contentType: "text/plain", bodyType: typeof(string), Description = "The Duplicate Entry Response")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.InternalServerError, contentType: "text/plain", bodyType: typeof(string), Description = "The InternalServerError Response")]
         public static async Task<HttpResponseMessage> RunAsync(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "registration")] HttpRequest req,
