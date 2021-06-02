@@ -39,5 +39,5 @@ jobs:
         app-name: 'vaccine-track'
         slot-name: 'production'
         package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_f015c1a89a0d4bba8f2ec4e180f7156b }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_83eed782d657472387b9e812feb5d9ab }}
   
