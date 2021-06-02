@@ -105,9 +105,9 @@ namespace CoWinAlert.DTO
                     _pincodes = JsonConvert.DeserializeObject<List<long>>(value)
                                             .Where(_code => Regex.IsMatch(_code.ToString(), @"^[0-9]{6}$"))
                                             .ToList();
-                    if(_pincodes.Count == 0){
-                        _isValid = false;
-                    }
+                    // if(_pincodes.Count == 0){
+                    //     _isValid = false;
+                    // }
                 }
                 catch{
                     _isValid = false;
@@ -129,9 +129,9 @@ namespace CoWinAlert.DTO
                                                     Regex.IsMatch(_code.ToString(), @"^[0-9]+$")
                                                 )
                                                 .ToList();
-                    if(_districtcodes.Count == 0){
-                        _isValid = false;
-                    }
+                    // if(_districtcodes.Count == 0){
+                    //     _isValid = false;
+                    // }
                 }
                 catch{
                     _isValid = false;
