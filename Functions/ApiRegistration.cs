@@ -69,18 +69,48 @@ namespace CoWinAlert.Function
                 log.LogInformation(JsonConvert.SerializeObject(registrationData, Formatting.Indented));
                 responseMessage += $"{registrationData.Name}, ";
 
-                // Check if it exists in table
-                if(TableInfo.isUserExisting(registrationData)
-                    && registrationData.isValid()
-                ){
-                    // Add to Table
-                    string x = TableInfo.AddRowtoTable(registrationData);
-                    log.LogInformation(x);
+                // Check if registration Data Valid
+                if(registrationData.isValid())
+                {
+                    // Check if it exists in table
+                    if(!TableInfo.isUserExisting(registrationData))
+                    {
+                        // Add to Table
+                        string x = TableInfo.AddRowtoTable(registrationData);
+                        log.LogInformation(x);
 
-                    // Send Email
-                    x = await Notifications.RegisterEmailAsync(registrationData);
-                    log.LogInformation(x);
+                        // Send Email
+                        x = await Notifications.RegisterEmailAsync(registrationData);
+                        log.LogInformation(x);
+
+                        responseMessage = $"Your details have been registered. You will recieve notifications on {registrationData.EmailID},"
+                                    +" Remember to check the SPAM FOLDER for mails from captain.nemo.github@gmail.com";
+                        log.LogInformation(responseMessage);
+                        
+                        return HttpResponseHandler.StructureResponse(content: responseMessage,
+                                                            code: HttpStatusCode.OK 
+                                                        );
+                    }
+                    else
+                    {
+                        responseMessage = $"User with Email-Id {registrationData.EmailID} aready Registered!,"
+                                    +" Remember to check the SPAM FOLDER for mails from captain.nemo.github@gmail.com"+"";
+                        log.LogWarning(responseMessage);
+
+                        return HttpResponseHandler.StructureResponse(content: responseMessage,
+                                                            code: HttpStatusCode.Conflict 
+                                                        );
+                    }
                 }
+                else
+                {
+                    responseMessage = "Invalid Data\n"+ registrationData.InvalidReason();
+                    log.LogWarning(responseMessage);
+
+                    return HttpResponseHandler.StructureResponse(content: responseMessage,
+                                                                code: HttpStatusCode.BadRequest 
+                                                            );
+                }                
             }
             catch(Exception ex){
                 log.LogError(ex.Message);
@@ -88,19 +118,7 @@ namespace CoWinAlert.Function
                                                         content: ex.StackTrace,
                                                         code: HttpStatusCode.InternalServerError 
                                                     );
-            }            
-            
-            
-            responseMessage += registrationData.isValid()
-                            ? $"Your details have been registered. You will recieve notifications on {registrationData.EmailID},"
-                                +" Remember to check the SPAM FOLDER for mails from captain.nemo.github@gmail.com"
-                            : "Invalid Data "+ registrationData.InvalidReason();
-
-            log.LogInformation(responseMessage);
-
-            return HttpResponseHandler.StructureResponse(content: responseMessage,
-                                                        code: HttpStatusCode.OK 
-                                                    );
+            }
         }
     }
 }
