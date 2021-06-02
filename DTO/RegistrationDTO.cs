@@ -185,7 +185,7 @@ namespace CoWinAlert.DTO
                 catch
                 {
                     _isValid = false;
-                    _reasonPhrase += $"\nError in Pin Code Parsing. Input value = {value}";
+                    _reasonPhrase += $"\nError in Vaccine Parsing. Input value = {value}";
                 }
             }
         }

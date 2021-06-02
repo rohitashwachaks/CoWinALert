@@ -44,3 +44,7 @@ Please note:
 - Please do not delete the extra brackets, quotes, colons or commas
 You will a registration confirmation email and mails if a slot opens up from captain.nemo.github@gmail.com .
 Check the spam if you haven't recieved it.
+
+## Pending Items
+
+- Remove Year of birth Validation once FrontEnd goes live.
