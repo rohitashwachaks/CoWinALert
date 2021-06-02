@@ -94,7 +94,9 @@ namespace CoWinAlert.Function
             responseMessage += registrationData.isValid()
                             ? $"Your details have been registered. You will recieve notifications on {registrationData.EmailID},"
                                 +" Remember to check the SPAM FOLDER for mails from captain.nemo.github@gmail.com"
-                            : "Invalid Data";
+                            : "Invalid Data "+ registrationData.InvalidReason();
+
+            log.LogInformation(responseMessage);
 
             return HttpResponseHandler.StructureResponse(content: responseMessage,
                                                         code: HttpStatusCode.OK 

@@ -78,7 +78,7 @@ namespace CoWinAlert.DTO
             }
             set{
                 try{
-                    if(Regex.IsMatch(value.ToString(),@"^19[0-9]{2}$|^200[0-9]$")){
+                    if(Regex.IsMatch(value.ToString(),@"^19[0-9]{2}$|^20[0-9]{2}$")){
                         _yearofBirth = value;
                     }
                     else{
