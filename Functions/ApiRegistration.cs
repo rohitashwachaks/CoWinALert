@@ -56,7 +56,7 @@ namespace CoWinAlert.Function
                     responseMessage = $"Test Data Received.\n {requestBody}";
                     log.LogInformation(responseMessage);
                         
-                    return HttpResponseHandler.StructureResponse(content: responseMessage,
+                    return HttpResponseHandler.StructureResponse(content: requestBody,
                                                         code: HttpStatusCode.OK 
                                                     );
                 }
