@@ -36,7 +36,7 @@ namespace CoWinAlert.Utils
             int queriedResponse = registrationTable.ExecuteQuery(tableQuery)
                                                             .ToList()
                                                             .Count;
-            return (queriedResponse == 0);            
+            return (queriedResponse != 0);            
         }
         public static string AddRowtoTable(RegistrationDTO user)
         {
