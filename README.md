@@ -2,7 +2,8 @@
 
 Queries CoWin and notifies user if slot opens up
 
-*[Link](https://vaccine-track.azurewebsites.net/api/swagger/ui?code=GQG%2FXjfaKcgXIYM5qvw5ryOTIABv%2F51gqNZWZiOzPQTybYI5HFCWdQ%3D%3D)*
+*[UI Link](https://covin-svc-ui.herokuapp.com/)*
+*[Swagger Link](https://vaccine-track.azurewebsites.net/api/swagger/ui?code=GQG%2FXjfaKcgXIYM5qvw5ryOTIABv%2F51gqNZWZiOzPQTybYI5HFCWdQ%3D%3D)*
 
 ## Step-1
 
