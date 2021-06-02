@@ -39,10 +39,27 @@ namespace CoWinAlert.Function
             string responseMessage = $"Hello ";
             string vaccineName = "";
             string payment = "";
+            string requestBody = "";
+            string test = "";
 
             try{
                 vaccineName = HttpUtility.HtmlEncode(req.Query["vaccine"].ToString());
                 payment = HttpUtility.HtmlEncode(req.Query["payment"].ToString());
+                
+                
+                test = HttpUtility.HtmlEncode(req.Query["test"].ToString());
+
+                requestBody = await new StreamReader(req.Body).ReadToEndAsync();            
+
+                if(test == "true")
+                {
+                    responseMessage = $"Test Data Received.\n {requestBody}";
+                    log.LogInformation(responseMessage);
+                        
+                    return HttpResponseHandler.StructureResponse(content: responseMessage,
+                                                        code: HttpStatusCode.OK 
+                                                    );
+                }
             }
             catch(Exception ex){
                 return HttpResponseHandler.StructureResponse(reason: "Invalid Query Parameters",
@@ -51,7 +68,6 @@ namespace CoWinAlert.Function
                                                     );
             }
             
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             
             if(requestBody == null){
                 log.LogError("No Data in request Body");
