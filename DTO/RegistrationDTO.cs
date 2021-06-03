@@ -22,7 +22,6 @@ namespace CoWinAlert.DTO
         private string _name = "";
         private string _email = "";
         private string _phone = "";
-        
         #endregion Private Members
         
         public RegistrationDTO()
@@ -225,11 +224,12 @@ namespace CoWinAlert.DTO
         }
         [JsonIgnore]
         public string Batch{get;set;}
+        public bool IsActive {get; set;}
         #endregion Public Members
 
         #region Public Functions        
         public bool isValid(){
-                return _isValid;
+            return _isValid;
         }
         public string InvalidReason(){
             return _reasonPhrase;
@@ -247,7 +247,7 @@ namespace CoWinAlert.DTO
         public string Payment{get;set;}
         public bool isActive{get;set;}
         public RegistrationTableSchemaDTO(){}
-        public RegistrationTableSchemaDTO(RegistrationDTO inp, bool isStatusActive = true){
+        public RegistrationTableSchemaDTO(RegistrationDTO inp){
             this.PartitionKey = inp.Batch;
             this.RowKey = inp.EmailID;
             this.Phone = inp.Phone;
@@ -258,7 +258,7 @@ namespace CoWinAlert.DTO
             this.PinCode = JsonConvert.SerializeObject(inp.Codes);
             this.DistrictCode = JsonConvert.SerializeObject(inp.District);
             this.Payment = inp.Payment;
-            this.isActive = isStatusActive;
+            this.isActive = inp.IsActive;
         }
     }
     [JsonConverter(typeof(StringEnumConverter))]
@@ -276,7 +276,6 @@ namespace CoWinAlert.DTO
         FREE,
         PAID
     }
-
     public class DateRangeDTO{
         public DateTime StartDate{get;set;}
         public DateTime EndDate{get;set;}

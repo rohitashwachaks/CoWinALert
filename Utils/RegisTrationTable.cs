@@ -9,6 +9,7 @@ namespace CoWinAlert.Utils
 {
     public static class TableInfo
     {
+        #region Private Variables and Initialisation
         private static CloudTable registrationTable;
         private static Random randomGenereator;
         public static void InitialiseConfig()
@@ -19,6 +20,8 @@ namespace CoWinAlert.Utils
 
             randomGenereator = new Random();
         }
+        #endregion Private Variables and Initialisation
+
         public static bool isUserExisting(RegistrationDTO user)
         {
             string vaccineFilter = TableQuery.GenerateFilterCondition("Vaccine",
@@ -38,7 +41,7 @@ namespace CoWinAlert.Utils
                                                             .Count;
             return (queriedResponse != 0);            
         }
-        public static string AddRowtoTable(RegistrationDTO user)
+        public static string UpsertRowtoTable(RegistrationDTO user)
         {
             string responseMessage = $"\nUser: {user.Name} Added Succesfully.\n";
             try{
@@ -127,12 +130,6 @@ namespace CoWinAlert.Utils
                                                         );
             filter = TableQuery.CombineFilters(filter, TableOperators.And, phoneFilter);
 
-            // string filter = TableQuery.GenerateFilterConditionForBool("isActive",
-            //                                                             QueryComparisons.Equal,
-            //                                                             true
-            //                                                         );
-            // filter = TableQuery.CombineFilters(emailFilter, TableOperators.And, filter);
-
             TableQuery tableQuery = new TableQuery().Where(filter);
             RegistrationDTO queriedResponse = new RegistrationDTO();
             try
@@ -168,7 +165,10 @@ namespace CoWinAlert.Utils
                                                                             : null,
                                                 DistrictCode = _item.Properties.ContainsKey("DistrictCode") ?
                                                                             _item.Properties["DistrictCode"].StringValue 
-                                                                            : null
+                                                                            : null,
+                                                IsActive = _item.Properties.ContainsKey("isActive") ? 
+                                                                            _item.Properties["isActive"].BooleanValue.Value
+                                                                            : true
                                                     })
                                                     .First();
                 return queriedResponse;

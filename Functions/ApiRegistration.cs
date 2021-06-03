@@ -93,7 +93,7 @@ namespace CoWinAlert.Function
                     if(!TableInfo.isUserExisting(registrationData))
                     {
                         // Add to Table
-                        string x = TableInfo.AddRowtoTable(registrationData);
+                        string x = TableInfo.UpsertRowtoTable(registrationData);
                         log.LogInformation(x);
 
                         // Send Email

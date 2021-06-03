@@ -74,7 +74,7 @@ namespace CoWinAlert.Function
                     )
                     {
                         // Add to Table
-                        body = TableInfo.AddRowtoTable(registrationData);
+                        body = TableInfo.UpsertRowtoTable(registrationData);
                         
                         // Send Email
                         body += await Notifications.RegisterEmailAsync(registrationData);

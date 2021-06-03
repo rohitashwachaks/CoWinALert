@@ -1,4 +1,9 @@
+using System;
 using System.Net;
+using System.Net.Http;
+using System.Web;
+using CoWinAlert.DTO;
+using CoWinAlert.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -6,18 +11,13 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using CoWinAlert.DTO;
-using System.Net.Http;
-using CoWinAlert.Utils;
-using System.Web;
-using System;
 
 namespace CoWinAlert.Function
 {
-    public static class FetchUserData
+    public static class UnregisterUser
     {
-        [FunctionName("api-fetch-data")]
-        [OpenApiOperation(tags: new[] { "API" }, Description = "Fetch Data of Registered Users")]
+        [FunctionName("api-unregister")]
+        [OpenApiOperation(tags: new[] { "API" }, Description = "Unregister Users")]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         [OpenApiParameter(name: "email-Id", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "Registered Email-ID of user")]
         [OpenApiParameter(name: "phone", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "Registered Phone Number")]
@@ -25,16 +25,16 @@ namespace CoWinAlert.Function
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.BadRequest, contentType: "text/plain", bodyType: typeof(string), Description = "The BadRequest Response")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.InternalServerError, contentType: "text/plain", bodyType: typeof(string), Description = "The InternalServerError Response")]
         public static HttpResponseMessage Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "fetch-data")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "unregister")] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("Fetch User Data HTTP trigger function processed a request.");
+            log.LogInformation("Unregister User Data HTTP trigger function processed a request.");
             string responseMessage = "";
 
             string emailId = HttpUtility.HtmlEncode(req.Query["email-Id"]);
             string phoneNumber = HttpUtility.HtmlEncode(req.Query["phone"]);
 
-            log.LogInformation($"Querying data for:\n User = {emailId}\n Phone Number = {phoneNumber}");
+            log.LogInformation($"Unregistering user with credentials:\n User = {emailId}\n Phone Number = {phoneNumber}");
 
             if (string.IsNullOrEmpty(emailId) || string.IsNullOrEmpty(phoneNumber))
             {
@@ -48,6 +48,7 @@ namespace CoWinAlert.Function
             RegistrationDTO queriedUser = new RegistrationDTO();
             try
             {
+                // Query User
                 queriedUser = TableInfo.FetchUser(emailId: emailId, phone: phoneNumber);
             }
             catch (Exception ex)
@@ -70,6 +71,15 @@ namespace CoWinAlert.Function
             }
             responseMessage = $"Record found for {queriedUser.Name}";
             log.LogInformation(responseMessage);
+
+            // Set IsActive False and Update Record
+            queriedUser.IsActive = false;
+            TableInfo.UpsertRowtoTable(user: queriedUser);
+
+            responseMessage = $"{queriedUser.Name} unregistered";
+            log.LogInformation(responseMessage);
+
+            
             return HttpResponseHandler.StructureResponse(content: queriedUser,
                                                         code: HttpStatusCode.OK
                                                     );

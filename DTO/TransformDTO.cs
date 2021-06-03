@@ -37,7 +37,7 @@ namespace CoWinAlert.DTO
             {
                 int count = 1;
                 foreach(string response in sourceTable.ExecuteQuery(tableQuery)
-                                                    .Select( _item => TableInfo.AddRowtoTable(new RegistrationDTO(){
+                                                    .Select( _item => TableInfo.UpsertRowtoTable(new RegistrationDTO(){
                                                         Vaccine = String.IsNullOrEmpty(_item.PartitionKey) ? 
                                                                                     "ANY"
                                                                                     : _item.PartitionKey,
@@ -64,7 +64,10 @@ namespace CoWinAlert.DTO
                                                                                     : null,
                                                         DistrictCode = _item.Properties.ContainsKey("DistrictCode") ?
                                                                                     _item.Properties["DistrictCode"].StringValue 
-                                                                                    : null
+                                                                                    : null,
+                                                        IsActive = _item.Properties.ContainsKey("isActive") ? 
+                                                                                    _item.Properties["isActive"].BooleanValue.Value
+                                                                                    : true
                                                     })))
                 {
                     responseList = responseList.Append($"{count++}: "+response);
