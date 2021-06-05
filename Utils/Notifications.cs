@@ -89,8 +89,7 @@ namespace CoWinAlert.Utils
         {
             string htmlContent = $"Hi {user.Name}!\n"
             +$"Your details have been registered with us.\n"
-            +$"You will recieve notifications on <strong>{user.EmailID}</strong>";
-            
+            +$"You will recieve notifications on <strong>{user.EmailID}</strong>";      
 
             return await SendEmail(userName: user.Name,
                         userEmail: user.EmailID,
@@ -112,12 +111,11 @@ namespace CoWinAlert.Utils
         public static string StructureSessionEmailBody(string name, IEnumerable<SessionCalendarDTO> input)
         {
             StringBuilder emailBody = new StringBuilder();
+            emailBody.AppendFormat("<p>Hi, {0}<p><p>"
+                            ,name
+                        );
             foreach(SessionCalendarDTO center in input)
             {
-                emailBody.AppendFormat("<p>Hi, {0}<p><p>"
-                                ,name
-                            );
-
                 emailBody.AppendFormat(CENTER_DETAILS
                                 ,center.Center_id
                                 ,center.Name
